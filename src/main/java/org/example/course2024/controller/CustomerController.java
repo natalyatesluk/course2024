@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/customer")
+@RequestMapping("/api/customers")
 public class CustomerController {
     private CustomerService customerService;
     public CustomerController(CustomerService customerService) {
@@ -24,12 +24,12 @@ public class CustomerController {
         return new ResponseEntity<CustomerDto>(customerService.getById(id), HttpStatus.OK);
     }
 
-    @GetMapping("")
+    @GetMapping()
     public ResponseEntity<List<CustomerDto>> getAllCustomers() {
         return new ResponseEntity<>(customerService.getAll(), HttpStatus.OK);
     }
 
-    @PostMapping("")
+    @PostMapping()
     public ResponseEntity<CustomerDto> createCustomer(@RequestBody CustomerDto customerDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(customerDto));
     }
