@@ -54,4 +54,10 @@ public class PriceService {
     public void delete(Long id) {
         priceRepository.deleteById(id);
     }
+
+    public List<PriceDto> getPricesInRange(double minPrice, double maxPrice) {
+        return priceRepository.findByPriceRange(minPrice, maxPrice).stream()
+                .map(priceMapper::toDto)
+                .collect(Collectors.toList());
+    }
 }

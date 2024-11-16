@@ -47,7 +47,7 @@ public class ScheduleService {
         return scheduleMapper.toDto(scheduleRepository.save(schedule));
     }
 
-    public ScheduleDto update(Long id, ScheduleDto scheduleDto) {
+    public ScheduleDto update(Long id, ScheduleCreationDto scheduleDto) {
         Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NotFoundException("Price not found"));
         schedule.setDate(scheduleDto.date());
         schedule.setStatus(scheduleDto.status());

@@ -37,7 +37,7 @@ public class ScheduleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ScheduleDto> updateSchedule(@PathVariable Long id, @RequestBody ScheduleDto scheduleDto) {
+    public ResponseEntity<ScheduleDto> updateSchedule(@PathVariable Long id, @RequestBody ScheduleCreationDto scheduleDto) {
         return new ResponseEntity<>(scheduleService.update(id, scheduleDto), HttpStatus.OK);
     }
 

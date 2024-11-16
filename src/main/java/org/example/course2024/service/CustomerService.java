@@ -22,7 +22,7 @@ public class CustomerService {
     @Transactional(readOnly = true)
     public CustomerDto getById(Long id) {
         Customer customer = customerRepository.findById(id).
-                orElseThrow(()->new NotFoundException("Customer not found"));
+                orElseThrow(() -> new NotFoundException("Customer not found"));
         return customerMapper.toDto(customer);
     }
 

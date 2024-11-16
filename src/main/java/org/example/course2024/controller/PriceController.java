@@ -43,4 +43,12 @@ public class PriceController {
         priceService.delete(id);
         return ResponseEntity.noContent().build();
     }
+    
+    @GetMapping("/range")
+    public ResponseEntity<List<PriceDto>> getPricesInRange(
+            @RequestParam double minPrice,
+            @RequestParam double maxPrice) {
+        List<PriceDto> prices = priceService.getPricesInRange(minPrice, maxPrice);
+        return new ResponseEntity<>(prices, HttpStatus.OK);
+    }
 }
