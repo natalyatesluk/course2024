@@ -9,6 +9,7 @@ import org.example.course2024.mapper.CustomerMapper;
 import org.example.course2024.repository.CustomerRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,5 +65,33 @@ public class CustomerService {
 
             return customers.stream().map(customer -> customerMapper.toDto(customer)).collect(Collectors.toList());
         }
+
+    public List<CustomerDto> sorted(String keyword, boolean reverse) {
+        List<Customer> customers = customerRepository.findAll();
+
+        List<Customer> sortedCustomers;
+        if (keyword.equalsIgnoreCase("name")) {
+            sortedCustomers = customers.stream()
+                    .sorted(reverse? Comparator.comparing(Customer::getName).reversed()
+                            :Comparator.comparing(Customer::getName))
+                    .collect(Collectors.toList());
+        } else if (keyword.equalsIgnoreCase("surname")) {
+            sortedCustomers = customers.stream()
+                    .sorted(reverse? Comparator.comparing(Customer::getSurname).reversed()
+                            :Comparator.comparing(Customer::getSurname))
+                    .collect(Collectors.toList());
+        } else if (keyword.equalsIgnoreCase("phone")) {
+            sortedCustomers = customers.stream()
+                    .sorted(reverse? Comparator.comparing(Customer::getPhone).reversed()
+                            :Comparator.comparing(Customer::getPhone))
+                    .collect(Collectors.toList());
+        } else {
+            sortedCustomers = customers;
+        }
+
+        return sortedCustomers.stream()
+                .map(customer -> customerMapper.toDto(customer))
+                .collect(Collectors.toList());
+    }
     }
 

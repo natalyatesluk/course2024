@@ -48,4 +48,10 @@ public class CustomerController {
     public ResponseEntity<List<CustomerDto>> searchCustomer(@RequestParam String keyword) {
         return new ResponseEntity<>(customerService.search(keyword), HttpStatus.OK);
     }
+
+    @GetMapping("/sort")
+    public ResponseEntity<List<CustomerDto>> sortCustomer(@RequestParam String keyword,
+                                                          @RequestParam(defaultValue = "false") boolean reverse) {
+        return new ResponseEntity<>(customerService.sorted(keyword, reverse), HttpStatus.OK);
+    }
 }
