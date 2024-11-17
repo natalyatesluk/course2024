@@ -22,10 +22,12 @@ public interface ScheduleMapper {
     @Mapping(source = "masterId", target = "master.id")
     Schedule toEntity(ScheduleCreationDto scheduleCreationDto);
 
-    @Mapping(source = "master.id", target = "masterId")
-    ScheduleCreationDto toDto1(Schedule schedule);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "masterId", target = "master.id")
     Schedule partialUpdate(ScheduleCreationDto scheduleCreationDto, @MappingTarget Schedule schedule);
+
+
+
+
 }

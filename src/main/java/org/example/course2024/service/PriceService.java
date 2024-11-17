@@ -12,6 +12,7 @@ import org.example.course2024.mapper.PriceMapper;
 import org.example.course2024.repository.PriceRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,7 +56,7 @@ public class PriceService {
         priceRepository.deleteById(id);
     }
 
-    public List<PriceDto> getPricesInRange(double minPrice, double maxPrice) {
+    public List<PriceDto> getPricesInRange(BigDecimal minPrice, BigDecimal maxPrice) {
         return priceRepository.findByPriceRange(minPrice, maxPrice).stream()
                 .map(priceMapper::toDto)
                 .collect(Collectors.toList());

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -43,11 +44,11 @@ public class PriceController {
         priceService.delete(id);
         return ResponseEntity.noContent().build();
     }
-    
+
     @GetMapping("/range")
     public ResponseEntity<List<PriceDto>> getPricesInRange(
-            @RequestParam double minPrice,
-            @RequestParam double maxPrice) {
+            @RequestParam BigDecimal minPrice,
+            @RequestParam BigDecimal maxPrice) {
         List<PriceDto> prices = priceService.getPricesInRange(minPrice, maxPrice);
         return new ResponseEntity<>(prices, HttpStatus.OK);
     }
