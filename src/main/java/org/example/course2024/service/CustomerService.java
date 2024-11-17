@@ -51,4 +51,18 @@ public class CustomerService {
     public void delete(Long id){
         customerRepository.deleteById(id);
     }
-}
+
+    public  List<CustomerDto> search(String keyword){
+        List<Customer> customers = customerRepository.findAll().stream()
+                .filter(customer ->
+                        (customer.getPhone() != null && customer.getPhone().contains(keyword)) ||
+                                (customer.getName() != null && customer.getName().toLowerCase().contains(keyword.toLowerCase())) ||
+                                (customer.getSurname() != null && customer.getSurname().toLowerCase().contains(keyword.toLowerCase()))||
+                                (customer.getPartBody() != null && customer.getPartBody().toString().contains(keyword.toUpperCase()))
+                )
+                .collect(Collectors.toList());
+
+            return customers.stream().map(customer -> customerMapper.toDto(customer)).collect(Collectors.toList());
+        }
+    }
+

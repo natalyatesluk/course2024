@@ -43,4 +43,9 @@ public class CustomerController {
         customerService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<CustomerDto>> searchCustomer(@RequestParam String keyword) {
+        return new ResponseEntity<>(customerService.search(keyword), HttpStatus.OK);
+    }
 }
