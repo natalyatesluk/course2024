@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.example.course2024.dto.AppointmentCreationDto;
 import org.example.course2024.dto.AppointmentDto;
 import org.example.course2024.entity.Appointment;
+import org.example.course2024.enums.StatusAppoint;
 import org.example.course2024.service.AppointmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/appointment")
@@ -41,6 +43,15 @@ public class AppointmentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<AppointmentDto> deleteAppointment(@PathVariable Long id) {
         appointmentService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.noContent().build();
     }
+    @GetMapping("/status-counts")
+    public ResponseEntity<Map<StatusAppoint, Long>> getStatusCounts(@RequestParam(defaultValue = "true") boolean status) {
+        if(status) {
+            Map<StatusAppoint, Long> statusCounts = appointmentService.getStatusCounts();
+            return new ResponseEntity<>(statusCounts, HttpStatus.OK);
+        }
+        return ResponseEntity.noContent().build();
+    }
+
 }

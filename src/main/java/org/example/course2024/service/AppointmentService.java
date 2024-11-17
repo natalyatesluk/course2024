@@ -8,6 +8,7 @@ import org.example.course2024.entity.Appointment;
 import org.example.course2024.entity.Customer;
 import org.example.course2024.entity.Master;
 import org.example.course2024.entity.Schedule;
+import org.example.course2024.enums.StatusAppoint;
 import org.example.course2024.exception.NotFoundException;
 import org.example.course2024.mapper.AppointmentMapper;
 import org.example.course2024.repository.AppointmentRepository;
@@ -17,7 +18,9 @@ import org.example.course2024.repository.ScheduleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,4 +79,10 @@ public class AppointmentService {
     public void delete(Long id){
         appointmentRepository.findById(id).orElseThrow(()->new NotFoundException("Appointment not found"));
     }
+    public Map<StatusAppoint, Long> getStatusCounts() {
+        List<Appointment> appointments = appointmentRepository.findAll();
+        return appointments.stream()
+                .collect(Collectors.groupingBy(Appointment::getStatus, Collectors.counting()));
+    }
 }
+
