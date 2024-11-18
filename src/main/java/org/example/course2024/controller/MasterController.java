@@ -1,4 +1,5 @@
 package org.example.course2024.controller;
+import org.example.course2024.dto.CustomerDto;
 import org.example.course2024.dto.MasterDto;
 import org.example.course2024.service.MasterService;
 import org.springframework.http.HttpStatus;
@@ -41,5 +42,15 @@ public class MasterController {
     public ResponseEntity<Void> deleteMaster(@PathVariable Long id) {
         masterService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/search")
+    public ResponseEntity<List<MasterDto>> searchCustomer(@RequestParam String keyword) {
+        return new ResponseEntity<>(masterService.search(keyword), HttpStatus.OK);
+    }
+
+    @GetMapping("/sort")
+    public ResponseEntity<List<MasterDto>> sortCustomer(@RequestParam String keyword,
+                                                          @RequestParam(defaultValue = "false") boolean reverse) {
+        return new ResponseEntity<>(masterService.sorted(keyword, reverse), HttpStatus.OK);
     }
 }
