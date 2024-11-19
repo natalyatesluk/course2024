@@ -48,13 +48,28 @@ public class ScheduleService {
         return scheduleMapper.toDto(scheduleRepository.save(schedule));
     }
 
-    public ScheduleDto update(Long id, ScheduleCreationDto scheduleDto) {
-        Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NotFoundException("Price not found"));
-        schedule.setDate(scheduleDto.date());
-        schedule.setStatus(scheduleDto.status());
-        Master master = masterRepository.findById(scheduleDto.masterId()).orElseThrow(() -> new NotFoundException("Master not found"));
-        schedule.setMaster(master);
-        return scheduleMapper.toDto(scheduleRepository.save(schedule));
+    public ScheduleDto update(Long id, ScheduleUpdatingDto scheduleDto) {
+        Schedule existingSchedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Schedule not found"));
+
+        if(scheduleDto.id() != null){
+            existingSchedule.setId(scheduleDto.id());
+        }
+        if (scheduleDto.masterId() != null) {
+            Master master = masterRepository.findById(scheduleDto.masterId())
+                    .orElseThrow(() -> new NotFoundException("Master not found"));
+            existingSchedule.setMaster(master);
+        }
+
+        if (scheduleDto.status() != null) {
+            existingSchedule.setStatus(scheduleDto.status());
+        }
+
+        if (scheduleDto.date() != null) {
+            existingSchedule.setDate(scheduleDto.date());
+        }
+
+        return scheduleMapper.toDto(scheduleRepository.save(existingSchedule));
     }
 
     public void delete(Long id) {
@@ -69,13 +84,13 @@ public class ScheduleService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
-    public List<ScheduleDto> getByTimeRange(LocalTime startTime, LocalTime endTime) {
-        return scheduleRepository.findByTimeRange(startTime, endTime)
-                .stream()
-                .map(scheduleMapper::toDto)
-                .collect(Collectors.toList());
-    }
+//    @Transactional(readOnly = true)
+//    public List<ScheduleDto> getByTimeRange(LocalTime startTime, LocalTime endTime) {
+//        return scheduleRepository.findByTimeRange(startTime, endTime)
+//                .stream()
+//                .map(scheduleMapper::toDto)
+//                .collect(Collectors.toList());
+//    }
 
     @Transactional(readOnly = true)
     public List<ScheduleDto> getByDateTimeRange(LocalDateTime startDateTime, LocalDateTime endDateTime) {

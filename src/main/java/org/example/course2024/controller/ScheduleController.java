@@ -3,6 +3,7 @@ package org.example.course2024.controller;
 
 import org.example.course2024.dto.ScheduleCreationDto;
 import org.example.course2024.dto.ScheduleDto;
+import org.example.course2024.dto.ScheduleUpdatingDto;
 import org.example.course2024.entity.Schedule;
 import org.example.course2024.service.ScheduleService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -41,7 +42,7 @@ public class ScheduleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ScheduleDto> updateSchedule(@PathVariable Long id, @RequestBody ScheduleCreationDto scheduleDto) {
+    public ResponseEntity<ScheduleDto> updateSchedule(@PathVariable Long id, @RequestBody ScheduleUpdatingDto scheduleDto) {
         return new ResponseEntity<>(scheduleService.update(id, scheduleDto), HttpStatus.OK);
     }
 
