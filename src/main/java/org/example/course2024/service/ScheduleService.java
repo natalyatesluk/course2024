@@ -61,29 +61,30 @@ public class ScheduleService {
         scheduleRepository.deleteById(id);
     }
 
-//    @Transactional(readOnly = true)
-//    public List<ScheduleDto> getByDateRange(LocalDate startDate, LocalDate endDate) {
-//        return scheduleRepository.findByDateRange(startDate, endDate)
-//                .stream()
-//                .map(scheduleMapper::toDto)
-//                .collect(Collectors.toList());
-//    }
-//
-//    @Transactional(readOnly = true)
-//    public List<ScheduleDto> getByTimeRange(LocalTime startTime, LocalTime endTime) {
-//        return scheduleRepository.findByTimeRange(startTime, endTime)
-//                .stream()
-//                .map(scheduleMapper::toDto)
-//                .collect(Collectors.toList());
-//    }
-//
-//    @Transactional(readOnly = true)
-//    public List<ScheduleDto> getByDateTimeRange(LocalDateTime startDateTime, LocalDateTime endDateTime) {
-//        return scheduleRepository.findByDateTimeRange(startDateTime, endDateTime)
-//                .stream()
-//                .map(scheduleMapper::toDto)
-//                .collect(Collectors.toList());
-//    }
+    @Transactional(readOnly = true)
+    public List<ScheduleDto> getByDateRange(LocalDate startDate, LocalDate endDate) {
+        return scheduleRepository.findByDateRange(startDate, endDate)
+                .stream()
+                .map(scheduleMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ScheduleDto> getByTimeRange(LocalTime startTime, LocalTime endTime) {
+        return scheduleRepository.findByTimeRange(startTime, endTime)
+                .stream()
+                .map(scheduleMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ScheduleDto> getByDateTimeRange(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        return scheduleRepository.findByDateTimeRange(startDateTime, endDateTime)
+                .stream()
+                .map(scheduleMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
     @Transactional(readOnly = true)
     public List<ScheduleDto> getStatusList(String status){
 

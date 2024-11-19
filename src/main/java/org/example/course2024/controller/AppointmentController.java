@@ -32,7 +32,7 @@ public class AppointmentController {
 
     @PostMapping()
     public ResponseEntity<AppointmentDto> createAppointment(@RequestBody AppointmentCreationDto appointmentDto) {
-    return new ResponseEntity<>(appointmentService.create(appointmentDto), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.create(appointmentDto));
     }
 
     @PutMapping("/{id}")

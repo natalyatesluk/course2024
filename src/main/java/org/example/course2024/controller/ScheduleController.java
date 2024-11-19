@@ -50,29 +50,33 @@ public class ScheduleController {
         scheduleService.delete(id);
         return ResponseEntity.noContent().build();
     }
-//    @GetMapping("/date-range")
-//    public ResponseEntity<List<ScheduleDto>> getSchedulesByDateRange(
-//            @RequestParam("startDate") LocalDate startDate,
-//            @RequestParam("endDate") LocalDate endDate) {
-//        List<ScheduleDto> schedules = scheduleService.getByDateRange(startDate, endDate);
-//        return new ResponseEntity<>(schedules, HttpStatus.OK);
-//    }
-//
+    @GetMapping("/date-range")
+    public ResponseEntity<List<ScheduleDto>> getSchedulesByDateRange(
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("endDate") LocalDate endDate) {
+        List<ScheduleDto> schedules = scheduleService.getByDateRange(startDate, endDate);
+        return new ResponseEntity<>(schedules, HttpStatus.OK);
+    }
+
 //    @GetMapping("/time-range")
 //    public ResponseEntity<List<ScheduleDto>> getSchedulesByTimeRange(
-//            @RequestParam("startTime") LocalTime startTime,
-//            @RequestParam("endTime") LocalTime endTime) {
+//            @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+//            @RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
 //        List<ScheduleDto> schedules = scheduleService.getByTimeRange(startTime, endTime);
 //        return new ResponseEntity<>(schedules, HttpStatus.OK);
 //    }
-//
-//    @GetMapping("/date-time-range")
-//    public ResponseEntity<List<ScheduleDto>> getSchedulesByDateTimeRange(
-//            @RequestParam("startDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
-//            @RequestParam("endDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime) {
-//        List<ScheduleDto> schedules = scheduleService.getByDateTimeRange(startDateTime, endDateTime);
-//        return new ResponseEntity<>(schedules, HttpStatus.OK);
-//    }
+
+
+    @GetMapping("/timeDateRange")
+    public ResponseEntity<List<ScheduleDto>> getSchedulesByDateTimeRange(
+            @RequestParam("startDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+            @RequestParam("endDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime) {
+        System.out.println("Start Date Time: " + startDateTime);
+        System.out.println("End Date Time: " + endDateTime);
+        List<ScheduleDto> schedules = scheduleService.getByDateTimeRange(startDateTime, endDateTime);
+        return new ResponseEntity<>(schedules, HttpStatus.OK);
+    }
+
 
     @GetMapping("/status")
     public ResponseEntity<List<ScheduleDto>> getSchedulesByStatus(@RequestParam String status) {

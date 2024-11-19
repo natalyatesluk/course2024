@@ -21,10 +21,11 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT s FROM Schedule s WHERE FUNCTION('TIME', s.date) BETWEEN :startTime AND :endTime")
+    @Query(value = "SELECT * FROM schedule s WHERE CAST(s.date AS TIME) BETWEEN :startTime AND :endTime", nativeQuery = true)
     List<Schedule> findByTimeRange(
             @Param("startTime") LocalTime startTime,
             @Param("endTime") LocalTime endTime);
+
 
     @Query("SELECT s FROM Schedule s WHERE s.date BETWEEN :startDateTime AND :endDateTime")
     List<Schedule> findByDateTimeRange(
