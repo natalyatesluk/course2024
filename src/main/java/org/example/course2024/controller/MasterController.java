@@ -1,12 +1,16 @@
 package org.example.course2024.controller;
+
 import org.example.course2024.dto.CustomerDto;
 import org.example.course2024.dto.MasterDto;
+import org.example.course2024.dto.PagedDataDto;
 import org.example.course2024.service.MasterService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/masters")
@@ -19,14 +23,18 @@ public class MasterController {
 
     @GetMapping("/{id}")
     public ResponseEntity<MasterDto> getMaster(@PathVariable Long id) {
-        MasterDto masterDto =masterService.getById(id);
+        MasterDto masterDto = masterService.getById(id);
         return new ResponseEntity<>(masterDto, HttpStatus.OK);
     }
+
     @GetMapping("")
-    public ResponseEntity<List<MasterDto>> getAll() {
-        List<MasterDto> masterDto = masterService.getAll();
-        return new ResponseEntity<>(masterDto, HttpStatus.OK);
+    public ResponseEntity<PagedDataDto<MasterDto>> getAll(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "3") int size
+    ) {
+        return new ResponseEntity<>(masterService.getAll(PageRequest.of(page, size)), HttpStatus.OK);
     }
+
     @PostMapping
     public ResponseEntity<MasterDto> createMaster(@RequestBody MasterDto masterDto) {
         MasterDto createdMaster = masterService.create(masterDto);
@@ -38,19 +46,23 @@ public class MasterController {
         MasterDto updatedMaster = masterService.update(id, masterDto);
         return ResponseEntity.ok(updatedMaster);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMaster(@PathVariable Long id) {
         masterService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping("/search")
-    public ResponseEntity<List<MasterDto>> searchCustomer(@RequestParam String keyword) {
-        return new ResponseEntity<>(masterService.search(keyword), HttpStatus.OK);
+    public ResponseEntity<PagedDataDto<MasterDto>> searchCustomer(@RequestParam String keyword,
+                                                          @RequestParam(required = false, defaultValue = "0") int page,
+                                                          @RequestParam(required = false, defaultValue = "3") int size) {
+        return new ResponseEntity<>(masterService.search(keyword, PageRequest.of(page, size)), HttpStatus.OK);
     }
 
     @GetMapping("/sort")
     public ResponseEntity<List<MasterDto>> sortCustomer(@RequestParam String keyword,
-                                                          @RequestParam(defaultValue = "false") boolean reverse) {
+                                                        @RequestParam(defaultValue = "false") boolean reverse) {
         return new ResponseEntity<>(masterService.sorted(keyword, reverse), HttpStatus.OK);
     }
 }
