@@ -4,6 +4,7 @@ package org.example.course2024.controller;
 import lombok.AllArgsConstructor;
 import org.example.course2024.dto.AppointmentCreationDto;
 import org.example.course2024.dto.AppointmentDto;
+import org.example.course2024.dto.AppointmentUpdatingDto;
 import org.example.course2024.entity.Appointment;
 import org.example.course2024.enums.StatusAppoint;
 import org.example.course2024.service.AppointmentService;
@@ -36,7 +37,7 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AppointmentDto> updateAppointment(@PathVariable Long id,@RequestBody AppointmentDto appointmentDto) {
+    public ResponseEntity<AppointmentDto> updateAppointment(@PathVariable Long id,@RequestBody AppointmentUpdatingDto appointmentDto) {
         return new ResponseEntity<>(appointmentService.update(appointmentDto,id), HttpStatus.OK);
     }
 

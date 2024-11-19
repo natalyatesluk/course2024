@@ -28,8 +28,6 @@ public interface AppointmentMapper {
     @Mapping(source = "customerId", target = "customer.id")
     Appointment toEntity(AppointmentCreationDto appointmentCreationDto);
 
-    @InheritInverseConfiguration(name = "toEntity")
-    AppointmentCreationDto toDto1(Appointment appointment);
 
     @InheritConfiguration(name = "toEntity")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
