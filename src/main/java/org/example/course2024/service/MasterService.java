@@ -95,31 +95,31 @@ public class MasterService {
 
     }
 
-    public List<MasterDto> sorted(String keyword, boolean reverse) {
-        List<Master> masters = masterRepository.findAll();
-
-        List<Master> sortedMasters;
-        if (keyword.equalsIgnoreCase("name")) {
-            sortedMasters = masters.stream()
-                    .sorted(reverse ? Comparator.comparing(Master::getName).reversed()
-                            : Comparator.comparing(Master::getName))
-                    .collect(Collectors.toList());
-        } else if (keyword.equalsIgnoreCase("surname")) {
-            sortedMasters = masters.stream()
-                    .sorted(reverse ? Comparator.comparing(Master::getSurname).reversed()
-                            : Comparator.comparing(Master::getSurname))
-                    .collect(Collectors.toList());
-        } else if (keyword.equalsIgnoreCase("phone")) {
-            sortedMasters = masters.stream()
-                    .sorted(reverse ? Comparator.comparing(Master::getPhone).reversed()
-                            : Comparator.comparing(Master::getPhone))
-                    .collect(Collectors.toList());
-        } else {
-            sortedMasters = masters;
-        }
-
-        return sortedMasters.stream()
-                .map(master -> masterMapper.toDto(master))
-                .collect(Collectors.toList());
-    }
+//    public List<MasterDto> sorted(String keyword, boolean reverse) {
+//        List<Master> masters = masterRepository.findAll();
+//
+//        List<Master> sortedMasters;
+//        if (keyword.equalsIgnoreCase("name")) {
+//            sortedMasters = masters.stream()
+//                    .sorted(reverse ? Comparator.comparing(Master::getName).reversed()
+//                            : Comparator.comparing(Master::getName))
+//                    .collect(Collectors.toList());
+//        } else if (keyword.equalsIgnoreCase("surname")) {
+//            sortedMasters = masters.stream()
+//                    .sorted(reverse ? Comparator.comparing(Master::getSurname).reversed()
+//                            : Comparator.comparing(Master::getSurname))
+//                    .collect(Collectors.toList());
+//        } else if (keyword.equalsIgnoreCase("phone")) {
+//            sortedMasters = masters.stream()
+//                    .sorted(reverse ? Comparator.comparing(Master::getPhone).reversed()
+//                            : Comparator.comparing(Master::getPhone))
+//                    .collect(Collectors.toList());
+//        } else {
+//            sortedMasters = masters;
+//        }
+//
+//        return sortedMasters.stream()
+//                .map(master -> masterMapper.toDto(master))
+//                .collect(Collectors.toList());
+//    }
 }

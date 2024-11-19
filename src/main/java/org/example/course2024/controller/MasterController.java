@@ -5,6 +5,7 @@ import org.example.course2024.dto.MasterDto;
 import org.example.course2024.dto.PagedDataDto;
 import org.example.course2024.service.MasterService;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -61,8 +62,12 @@ public class MasterController {
     }
 
     @GetMapping("/sort")
-    public ResponseEntity<List<MasterDto>> sortCustomer(@RequestParam String keyword,
-                                                        @RequestParam(defaultValue = "false") boolean reverse) {
-        return new ResponseEntity<>(masterService.sorted(keyword, reverse), HttpStatus.OK);
+    public ResponseEntity<PagedDataDto<MasterDto>> sortCustomer(@RequestParam String keyword,
+                                                        @RequestParam(defaultValue = "false") boolean reverse,
+                                                        @RequestParam(required = false, defaultValue = "0") int page,
+                                                        @RequestParam(required = false, defaultValue = "3") int size) {
+
+        Sort sort = Sort.by(reverse ? Sort.Direction.DESC : Sort.Direction.ASC, keyword);
+        return new ResponseEntity<>(masterService.getAll(PageRequest.of(page,size, sort)), HttpStatus.OK);
     }
 }
