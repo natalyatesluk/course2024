@@ -2,6 +2,7 @@ package org.example.course2024.mapper;
 
 import org.example.course2024.dto.MasterCreationDto;
 import org.example.course2024.dto.MasterDto;
+import org.example.course2024.dto.MasterUpdatingDto;
 import org.example.course2024.entity.Master;
 import org.mapstruct.*;
 
@@ -17,4 +18,8 @@ public interface MasterMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Master partialUpdate(MasterCreationDto masterCreationDto, @MappingTarget Master master);
 
+    Master toEntity(MasterUpdatingDto masterUpdatingDto);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Master partialUpdate(MasterUpdatingDto masterUpdatingDto, @MappingTarget Master master);
 }
