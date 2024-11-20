@@ -1,5 +1,6 @@
 package org.example.course2024.service;
 
+import org.example.course2024.dto.MasterCreationDto;
 import org.example.course2024.dto.PagedDataDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -32,7 +33,7 @@ public class MasterService {
         return masterMapper.toDto(master);
     }
 
-    public MasterDto create(MasterDto master) {
+    public MasterDto create(MasterCreationDto master) {
 
         return masterMapper.toDto(masterRepository.save(masterMapper.toEntity(master)));
     }

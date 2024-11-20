@@ -1,5 +1,6 @@
 package org.example.course2024.controller;
 
+import org.example.course2024.dto.MasterCreationDto;
 import org.example.course2024.dto.MasterDto;
 import org.example.course2024.dto.PagedDataDto;
 import org.example.course2024.service.MasterService;
@@ -37,9 +38,9 @@ public class MasterController {
         return new ResponseEntity<>(masterService.getAll(PageRequest.of(page, size)), HttpStatus.OK);
     }
 
-    @CachePut(value = "masters", key = "#masterDto.id")
+    @CachePut(value = "masters")
     @PostMapping
-    public ResponseEntity<MasterDto> createMaster(@RequestBody MasterDto masterDto) {
+    public ResponseEntity<MasterDto> createMaster(@RequestBody MasterCreationDto masterDto) {
         MasterDto createdMaster = masterService.create(masterDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdMaster);
     }

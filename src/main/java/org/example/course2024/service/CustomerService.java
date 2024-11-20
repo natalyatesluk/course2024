@@ -1,5 +1,6 @@
 package org.example.course2024.service;
 
+import org.example.course2024.dto.CustomerCreationDto;
 import org.example.course2024.dto.CustomerDto;
 import org.example.course2024.entity.Customer;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ public class CustomerService {
         return customerMapper.toDto(customer);
     }
 
-  public CustomerDto create(CustomerDto customerDto) {
+  public CustomerDto create(CustomerCreationDto customerDto) {
         return customerMapper.toDto(customerRepository.save(customerMapper.toEntity(customerDto)));
   }
 

@@ -1,5 +1,6 @@
 package org.example.course2024.controller;
 
+import org.example.course2024.dto.CustomerCreationDto;
 import org.example.course2024.dto.CustomerDto;
 import org.example.course2024.entity.Customer;
 import org.example.course2024.service.CustomerService;
@@ -30,7 +31,7 @@ public class CustomerController {
     }
 
     @PostMapping()
-    public ResponseEntity<CustomerDto> createCustomer(@RequestBody CustomerDto customerDto) {
+    public ResponseEntity<CustomerDto> createCustomer(@RequestBody CustomerCreationDto customerDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(customerDto));
     }
 
