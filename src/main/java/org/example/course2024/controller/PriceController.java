@@ -2,6 +2,7 @@ package org.example.course2024.controller;
 
 import org.example.course2024.dto.PriceCreationDto;
 import org.example.course2024.dto.PriceDto;
+import org.example.course2024.dto.PriceUpdatingDto;
 import org.example.course2024.service.PriceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class PriceController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PriceDto> updatePrice(@PathVariable Long id, @RequestBody PriceDto priceDto) {
+    public ResponseEntity<PriceDto> updatePrice(@PathVariable Long id, @RequestBody PriceUpdatingDto priceDto) {
         return new ResponseEntity<>(priceService.update(id, priceDto), HttpStatus.OK);
     }
 

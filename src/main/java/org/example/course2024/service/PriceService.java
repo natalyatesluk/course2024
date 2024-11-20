@@ -2,6 +2,7 @@ package org.example.course2024.service;
 
 import org.example.course2024.dto.PriceCreationDto;
 import org.example.course2024.dto.PriceDto;
+import org.example.course2024.dto.PriceUpdatingDto;
 import org.example.course2024.entity.Master;
 import org.example.course2024.repository.MasterRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,12 +44,23 @@ public class PriceService {
         return priceMapper.toDto(priceRepository.save(price));
     }
 
-    public PriceDto update(Long id, PriceDto priceDto) {
+    public PriceDto update(Long id, PriceUpdatingDto priceDto) {
         Price price = priceRepository.findById(id).orElseThrow(() -> new NotFoundException("Price not found"));
-        price.setPrice(priceDto.price());
-        price.setSize(priceDto.size());
-        Master master = masterRepository.findById(priceDto.masterId()).orElseThrow(() -> new NotFoundException("Master not found"));
-        price.setMaster(master);
+        if(priceDto.id()!=null)
+        {
+            price.setId(id);
+        }
+        if(priceDto.masterId()!=null)
+        {
+            Master master = masterRepository.findById(priceDto.masterId()).orElseThrow(() -> new NotFoundException("Master not found"));
+            price.setMaster(master);
+        }
+        if(priceDto.price()!=null){
+            price.setPrice(priceDto.price());
+        }
+        if(priceDto.size()!=null){
+            price.setSize(priceDto.size());
+        }
         return priceMapper.toDto(priceRepository.save(price));
     }
 
