@@ -11,6 +11,7 @@ import org.example.course2024.entity.Master;
 import org.example.course2024.entity.Schedule;
 import org.example.course2024.enums.StatusAppoint;
 import org.example.course2024.enums.StatusTime;
+import org.example.course2024.exception.MasterNotSchedule;
 import org.example.course2024.exception.NotFoundException;
 import org.example.course2024.exception.ScheduleAlreadyBusyException;
 import org.example.course2024.mapper.AppointmentMapper;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,56 +56,83 @@ public class AppointmentService {
         Schedule schedule = scheduleRepository.findById(appointmentDto.scheduleId()).orElseThrow(()->new NotFoundException("Schedule not found"));
         Appointment appointment = appointmentMapper.toEntity(appointmentDto);
 
+        if (schedule.getStatus() == StatusTime.BUSY) {
+            throw new ScheduleAlreadyBusyException("The selected schedule is already marked as busy.");
+        }
+        if(!Objects.equals(schedule.getMaster().getId(), appointment.getMaster().getId())){
+            throw new MasterNotSchedule("This master doesn't match this record");
+        }
+
         appointment.setCustomer(customer);
         appointment.setMaster(master);
+        schedule.setStatus(StatusTime.BUSY);
+        scheduleRepository.save(schedule);
         appointment.setSchedule(schedule);
         appointmentRepository.save(appointment);
         return appointmentMapper.toDto(appointment);
     }
 
-    public AppointmentDto update(AppointmentUpdatingDto appointmentDto, Long id){
-        Appointment appointment= appointmentRepository.findById(id).orElseThrow(()->new NotFoundException("Appointment not found"));
+    public AppointmentDto update(AppointmentUpdatingDto appointmentDto, Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Appointment not found"));
 
-        if(appointmentDto.id()!=null){
+        if (appointmentDto.id() != null) {
             appointment.setId(appointmentDto.id());
         }
-        if(appointmentDto.masterId()!=null){
-            Master master =masterRepository.findById(appointmentDto.masterId()).orElseThrow(()->new NotFoundException("Master not found"));
+
+        if (appointmentDto.masterId() != null) {
+            Master master = masterRepository.findById(appointmentDto.masterId())
+                    .orElseThrow(() -> new NotFoundException("Master not found"));
             appointment.setMaster(master);
         }
-        if(appointmentDto.customerId()!=null){
-            Customer customer = customerRepository.findById(appointmentDto.customerId()).orElseThrow(()->new NotFoundException("Customer not found"));
+
+        if (appointmentDto.customerId() != null) {
+            Customer customer = customerRepository.findById(appointmentDto.customerId())
+                    .orElseThrow(() -> new NotFoundException("Customer not found"));
             appointment.setCustomer(customer);
         }
-        if(appointmentDto.status()!=null){
+
+        if (appointmentDto.status() != null) {
             appointment.setStatus(appointmentDto.status());
-            if(appointmentDto.status()== StatusAppoint.CANCELLED){
-                Schedule schedule = scheduleRepository.findById(appointment.getId()).orElseThrow(()->new NotFoundException("Schedule not found"));
+            if (appointmentDto.status() == StatusAppoint.CANCELLED) {
+                Schedule schedule = scheduleRepository.findById(appointment.getSchedule().getId())
+                        .orElseThrow(() -> new NotFoundException("Schedule not found"));
                 schedule.setStatus(StatusTime.FREE);
             }
         }
-        if(appointmentDto.scheduleId()!=null){
-            if(!appointmentDto.scheduleId().equals(appointment.getSchedule().getId())){
-                Schedule scheduleOld = scheduleRepository.findById(appointment.getSchedule().getId())
-                        .orElseThrow(() -> new NotFoundException("Schedule not found"));
-                Schedule scheduleNew = scheduleRepository.findById(appointmentDto.scheduleId()).orElseThrow(()->new NotFoundException("Schedule not found"));
-                if (scheduleNew.getStatus() == StatusTime.BUSY) {
-                    throw new ScheduleAlreadyBusyException("The selected schedule is already marked as busy.");
-                }
-                scheduleOld.setStatus(StatusTime.FREE);
-                scheduleRepository.save(scheduleOld);
-                scheduleNew.setStatus(StatusTime.BUSY);
-                scheduleRepository.save(scheduleNew);
-                appointment.setSchedule(scheduleNew);
-            }
-        }
 
+        if (appointmentDto.scheduleId() != null) {
+            Schedule scheduleOld = scheduleRepository.findById(appointment.getSchedule().getId())
+                    .orElseThrow(() -> new NotFoundException("Schedule not found"));
+            Schedule scheduleNew = scheduleRepository.findById(appointmentDto.scheduleId())
+                    .orElseThrow(() -> new NotFoundException("Schedule not found"));
+
+            if (scheduleNew.getStatus() == StatusTime.BUSY) {
+                throw new ScheduleAlreadyBusyException("The selected schedule is already marked as busy.");
+            }
+            if(!Objects.equals(scheduleNew.getMaster().getId(), appointment.getMaster().getId())){
+                throw new MasterNotSchedule("This master doesn't match this record");
+            }
+            scheduleOld.setStatus(StatusTime.FREE);
+            scheduleRepository.save(scheduleOld);
+
+            scheduleNew.setStatus(StatusTime.BUSY);
+            scheduleRepository.save(scheduleNew);
+
+            appointment.setSchedule(scheduleNew);
+        }
+        if(appointmentDto.localDateTime() != null){
+            Schedule schedule = scheduleRepository.findById(appointment.getSchedule().getId()).orElseThrow(()->new NotFoundException("Schedule not found"));
+            schedule.setDate(appointmentDto.localDateTime());
+            scheduleRepository.save(schedule);
+            appointment.setSchedule(schedule);
+        }
         appointmentRepository.save(appointment);
         return appointmentMapper.toDto(appointment);
     }
 
     public void delete(Long id){
-        appointmentRepository.findById(id).orElseThrow(()->new NotFoundException("Appointment not found"));
+        appointmentRepository.deleteById(id);
     }
     public Map<StatusAppoint, Long> getStatusCounts() {
         List<Appointment> appointments = appointmentRepository.findAll();

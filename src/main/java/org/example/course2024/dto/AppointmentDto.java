@@ -9,5 +9,7 @@ import java.time.LocalDateTime;
 /**
  * DTO for {@link org.example.course2024.entity.Appointment}
  */
-public record AppointmentDto(Long id, Long customerId, String customerSurname, String customerPhone, PartBody customerPartBody, LocalDateTime scheduleDate, Long masterId, String masterSurname, String masterPhone, StatusAppoint status) implements Serializable {
+public record AppointmentDto(Long id, StatusAppoint status, String customerSurname, String customerPhone,
+                             String customerEmail, PartBody customerPartBody, LocalDateTime scheduleDate,
+                             String masterSurname, String masterPhone, String masterEmail) implements Serializable {
   }

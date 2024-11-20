@@ -1,9 +1,6 @@
 package org.example.course2024.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import org.example.course2024.enums.PartBody;
 
 import java.io.Serializable;
@@ -15,5 +12,6 @@ public record CustomerDto(Long id, @NotNull @Size(max = 255) @NotEmpty @NotBlank
                           @NotNull @Size(max = 255) @NotEmpty @NotBlank String surname,
                           @NotNull @Size(max = 255) @NotEmpty @NotBlank String middleName,
                           @NotNull @Size(min = 8, max = 20) @NotEmpty @NotBlank String phone,
+                          @NotNull @Email @Size(max = 255) @NotEmpty @NotBlank String email,
                           @NotNull PartBody partBody) implements Serializable {
 }

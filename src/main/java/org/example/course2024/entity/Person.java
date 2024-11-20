@@ -23,7 +23,10 @@ public class Person {
     @Column(name = "middleName", nullable = false)
     private String middleName;
 
-    @Column(name = "phone", nullable = false)
+    @Column(name = "phone", nullable = false,unique = true)
     private String phone;
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
 
 }

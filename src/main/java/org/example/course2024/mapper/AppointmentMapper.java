@@ -7,6 +7,13 @@ import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface AppointmentMapper {
+    @Mapping(source = "masterEmail", target = "master.email")
+    @Mapping(source = "masterPhone", target = "master.phone")
+    @Mapping(source = "scheduleDate", target = "schedule.date")
+    @Mapping(source = "customerPartBody", target = "customer.partBody")
+    @Mapping(source = "customerEmail", target = "customer.email")
+    @Mapping(source = "customerPhone", target = "customer.phone")
+    @Mapping(source = "customerSurname", target = "customer.surname")
     @Mapping(source = "masterPhone", target = "master.phone")
     @Mapping(source = "masterSurname", target = "master.surname")
     @Mapping(source = "masterId", target = "master.id")
