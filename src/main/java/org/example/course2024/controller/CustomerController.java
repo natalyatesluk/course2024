@@ -2,6 +2,7 @@ package org.example.course2024.controller;
 
 import org.example.course2024.dto.CustomerCreationDto;
 import org.example.course2024.dto.CustomerDto;
+import org.example.course2024.dto.CustomerUpdatingDto;
 import org.example.course2024.entity.Customer;
 import org.example.course2024.service.CustomerService;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +37,7 @@ public class CustomerController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable Long id,@RequestBody CustomerDto customerDto) {
+    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable Long id,@RequestBody CustomerUpdatingDto customerDto) {
         return ResponseEntity.ok(customerService.update(id,customerDto));
     }
     @DeleteMapping("/{id}")

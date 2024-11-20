@@ -2,6 +2,7 @@ package org.example.course2024.controller;
 
 import org.example.course2024.dto.MasterCreationDto;
 import org.example.course2024.dto.MasterDto;
+import org.example.course2024.dto.MasterUpdatingDto;
 import org.example.course2024.dto.PagedDataDto;
 import org.example.course2024.service.MasterService;
 import org.springframework.cache.annotation.Cacheable;
@@ -47,7 +48,7 @@ public class MasterController {
 
     @CachePut(value = "masters", key = "#id")
     @PutMapping("/{id}")
-    public ResponseEntity<MasterDto> updateMaster(@PathVariable Long id, @RequestBody MasterDto masterDto) {
+    public ResponseEntity<MasterDto> updateMaster(@PathVariable Long id, @RequestBody MasterUpdatingDto masterDto) {
         MasterDto updatedMaster = masterService.update(id, masterDto);
         return ResponseEntity.ok(updatedMaster);
     }

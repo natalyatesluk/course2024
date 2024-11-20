@@ -2,6 +2,7 @@ package org.example.course2024.service;
 
 import org.example.course2024.dto.CustomerCreationDto;
 import org.example.course2024.dto.CustomerDto;
+import org.example.course2024.dto.CustomerUpdatingDto;
 import org.example.course2024.entity.Customer;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.AllArgsConstructor;
@@ -39,14 +40,35 @@ public class CustomerService {
                 .collect(Collectors.toList());
     }
 
-    public CustomerDto update(Long id, CustomerDto masterDto){
-        Customer customer = customerRepository.findById(id).
-                orElseThrow(()->new NotFoundException("Master not found"));
-        customer.setName(masterDto.name());
-        customer.setSurname(masterDto.surname());
-        customer.setMiddleName(masterDto.middleName());
-        customer.setPhone(masterDto.phone());
-        customer.setPartBody(masterDto.partBody());
+    public CustomerDto update(Long id, CustomerUpdatingDto customerUpdatingDto) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Customer not found"));
+
+        if(customerUpdatingDto.id() != null ) {
+            customer.setId(customerUpdatingDto.id());
+        }
+        if (customerUpdatingDto.name() != null && !customerUpdatingDto.name().isEmpty()) {
+            customer.setName(customerUpdatingDto.name());
+        }
+
+        if (customerUpdatingDto.surname() != null && !customerUpdatingDto.surname().isEmpty()) {
+            customer.setSurname(customerUpdatingDto.surname());
+        }
+
+        if (customerUpdatingDto.middleName() != null && !customerUpdatingDto.middleName().isEmpty()) {
+            customer.setMiddleName(customerUpdatingDto.middleName());
+        }
+
+        if (customerUpdatingDto.phone() != null && !customerUpdatingDto.phone().isEmpty()) {
+            customer.setPhone(customerUpdatingDto.phone());
+        }
+        if (customerUpdatingDto.email() != null) {
+            customer.setEmail(customerUpdatingDto.email());
+        }
+        if (customerUpdatingDto.partBody() != null) {
+            customer.setPartBody(customerUpdatingDto.partBody());
+        }
+
         return customerMapper.toDto(customerRepository.save(customer));
     }
 

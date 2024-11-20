@@ -1,6 +1,7 @@
 package org.example.course2024.service;
 
 import org.example.course2024.dto.MasterCreationDto;
+import org.example.course2024.dto.MasterUpdatingDto;
 import org.example.course2024.dto.PagedDataDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -55,14 +56,35 @@ public class MasterService {
         return pageMasterAll;
     }
 
-    public MasterDto update(Long id, MasterDto masterDto) {
+    public MasterDto update(Long id, MasterUpdatingDto masterDto) {
         Master master = masterRepository.findById(id).
                 orElseThrow(() -> new NotFoundException("Master not found"));
-        master.setName(masterDto.name());
-        master.setSurname(masterDto.surname());
-        master.setMiddleName(masterDto.middleName());
-        master.setPhone(masterDto.phone());
-        master.setDoneWork(masterDto.doneWork());
+        if(masterDto.id() != null ) {
+            master.setId(masterDto.id());
+        }
+        if (masterDto.name() != null && !masterDto.name().isEmpty()) {
+            master.setName(masterDto.name());
+        }
+
+        if (masterDto.surname() != null && !masterDto.surname().isEmpty()) {
+            master.setSurname(masterDto.surname());
+        }
+
+        if (masterDto.middleName() != null && !masterDto.middleName().isEmpty()) {
+            master.setMiddleName(masterDto.middleName());
+        }
+
+        if (masterDto.phone() != null && !masterDto.phone().isEmpty()) {
+            master.setPhone(masterDto.phone());
+        }
+
+        if (masterDto.email() != null) {
+            master.setEmail(masterDto.email());
+        }
+        if ((Integer)masterDto.doneWork() != null)
+        {
+            master.setDoneWork(masterDto.doneWork());
+        }
         return masterMapper.toDto(masterRepository.save(master));
     }
 
