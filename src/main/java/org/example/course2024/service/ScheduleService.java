@@ -12,6 +12,10 @@ import org.example.course2024.mapper.PriceMapperImpl;
 import org.example.course2024.mapper.ScheduleMapper;
 import org.example.course2024.repository.MasterRepository;
 import org.example.course2024.repository.ScheduleRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,10 +35,56 @@ public class ScheduleService {
     private final MasterRepository masterRepository;
 
     @Transactional(readOnly = true)
-    public List<ScheduleDto> getAll(){
-        return scheduleRepository.findAll().stream().map(scheduleMapper::toDto).collect(Collectors.toList());
+    public PagedDataDto<ScheduleDto> getAll(int page, int size, boolean asc) {
+        Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, "id");
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Schedule> schedulesPage = scheduleRepository.findAll(pageable);
+
+        return toPagedDataDto(schedulesPage);
     }
 
+    @Transactional(readOnly = true)
+    public PagedDataDto<ScheduleDto> getByDateRange(LocalDate startDate, LocalDate endDate, int page, int size, boolean asc) {
+        Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, "date");
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Schedule> schedulesPage = scheduleRepository.findByDateRange(startDate, endDate, pageable);
+
+        return toPagedDataDto(schedulesPage);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedDataDto<ScheduleDto> getByDateTimeRange(LocalDateTime startDateTime, LocalDateTime endDateTime, int page, int size, boolean asc) {
+        Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, "dateTime");
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Schedule> schedulesPage = scheduleRepository.findByDateTimeRange(startDateTime, endDateTime, pageable);
+
+        return toPagedDataDto(schedulesPage);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedDataDto<ScheduleDto> getStatusList(String status, int page, int size, boolean asc) {
+        Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, "date");
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        StatusTime statusTime = StatusTime.valueOf(status.toUpperCase());
+        Page<Schedule> schedulesPage = scheduleRepository.findByStatus(statusTime, pageable);
+
+        return toPagedDataDto(schedulesPage);
+    }
+
+    private PagedDataDto<ScheduleDto> toPagedDataDto(Page<Schedule> schedulesPage) {
+        List<ScheduleDto> schedules = schedulesPage.getContent().stream()
+                .map(scheduleMapper::toDto)
+                .collect(Collectors.toList());
+
+        return new PagedDataDto<>(
+                schedules,
+                schedulesPage.getNumber(),
+                schedulesPage.getSize(),
+                schedulesPage.getTotalElements(),
+                schedulesPage.getTotalPages()
+        );
+    }
     @Transactional(readOnly = true)
     public ScheduleDto getById(Long id){
         return scheduleMapper.toDto(scheduleRepository.findById(id).orElseThrow(() -> new NotFoundException("Time not found")));
@@ -76,12 +126,7 @@ public class ScheduleService {
         scheduleRepository.deleteById(id);
     }
 
-    @Transactional(readOnly = true)
-    public List<ScheduleDto> getByDateRange(LocalDate startDate, LocalDate endDate) {
-        return scheduleRepository.findByDateRange(startDate, endDate)
-                .stream()
-                .map(scheduleMapper::toDto)
-                .collect(Collectors.toList());
+
     }
 
 //    @Transactional(readOnly = true)
@@ -92,27 +137,5 @@ public class ScheduleService {
 //                .collect(Collectors.toList());
 //    }
 
-    @Transactional(readOnly = true)
-    public List<ScheduleDto> getByDateTimeRange(LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        return scheduleRepository.findByDateTimeRange(startDateTime, endDateTime)
-                .stream()
-                .map(scheduleMapper::toDto)
-                .collect(Collectors.toList());
-    }
 
-    @Transactional(readOnly = true)
-    public List<ScheduleDto> getStatusList(String status){
 
-        try {
-            StatusTime statusTime = StatusTime.valueOf(status.toUpperCase());
-
-            List<Schedule> schedules = scheduleRepository.findByStatus(statusTime);
-
-            return schedules.stream().map(scheduleMapper::toDto).collect(Collectors.toList());
-
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid status: " + status);
-        }
-
-    }
-}

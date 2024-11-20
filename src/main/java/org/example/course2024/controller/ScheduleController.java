@@ -1,6 +1,8 @@
 package org.example.course2024.controller;
 
 
+import lombok.AllArgsConstructor;
+import org.example.course2024.dto.PagedDataDto;
 import org.example.course2024.dto.ScheduleCreationDto;
 import org.example.course2024.dto.ScheduleDto;
 import org.example.course2024.dto.ScheduleUpdatingDto;
@@ -19,16 +21,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/schedule")
+@AllArgsConstructor
 public class ScheduleController {
     private final ScheduleService scheduleService;
 
-    public ScheduleController(ScheduleService scheduleService) {
-        this.scheduleService = scheduleService;
-    }
-
     @GetMapping()
-    public ResponseEntity<List<ScheduleDto>> getSchedules() {
-        return new ResponseEntity<>(scheduleService.getAll(), HttpStatus.OK);
+    public ResponseEntity<PagedDataDto<ScheduleDto>> getSchedules(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "true") boolean asc) {
+        return new ResponseEntity<>(scheduleService.getAll(page, size, asc), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -47,43 +49,38 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ScheduleDto> deleteSchedule(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id) {
         scheduleService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping("/date-range")
-    public ResponseEntity<List<ScheduleDto>> getSchedulesByDateRange(
+    public ResponseEntity<PagedDataDto<ScheduleDto>> getSchedulesByDateRange(
             @RequestParam("startDate") LocalDate startDate,
-            @RequestParam("endDate") LocalDate endDate) {
-        List<ScheduleDto> schedules = scheduleService.getByDateRange(startDate, endDate);
-        return new ResponseEntity<>(schedules, HttpStatus.OK);
+            @RequestParam("endDate") LocalDate endDate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "true") boolean asc) {
+        return new ResponseEntity<>(scheduleService.getByDateRange(startDate, endDate, page, size, asc), HttpStatus.OK);
     }
-
-//    @GetMapping("/time-range")
-//    public ResponseEntity<List<ScheduleDto>> getSchedulesByTimeRange(
-//            @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
-//            @RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
-//        List<ScheduleDto> schedules = scheduleService.getByTimeRange(startTime, endTime);
-//        return new ResponseEntity<>(schedules, HttpStatus.OK);
-//    }
-
 
     @GetMapping("/timeDateRange")
-    public ResponseEntity<List<ScheduleDto>> getSchedulesByDateTimeRange(
+    public ResponseEntity<PagedDataDto<ScheduleDto>> getSchedulesByDateTimeRange(
             @RequestParam("startDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
-            @RequestParam("endDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime) {
-        System.out.println("Start Date Time: " + startDateTime);
-        System.out.println("End Date Time: " + endDateTime);
-        List<ScheduleDto> schedules = scheduleService.getByDateTimeRange(startDateTime, endDateTime);
-        return new ResponseEntity<>(schedules, HttpStatus.OK);
+            @RequestParam("endDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "true") boolean asc) {
+        return new ResponseEntity<>(scheduleService.getByDateTimeRange(startDateTime, endDateTime, page, size, asc), HttpStatus.OK);
     }
-
 
     @GetMapping("/status")
-    public ResponseEntity<List<ScheduleDto>> getSchedulesByStatus(@RequestParam String status) {
-            List<ScheduleDto> freeSchedules = scheduleService.getStatusList(status);
-            return new ResponseEntity<>(freeSchedules, HttpStatus.OK);
+    public ResponseEntity<PagedDataDto<ScheduleDto>> getSchedulesByStatus(
+            @RequestParam String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "true") boolean asc) {
+        return new ResponseEntity<>(scheduleService.getStatusList(status, page, size, asc), HttpStatus.OK);
     }
-
-
 }
+
