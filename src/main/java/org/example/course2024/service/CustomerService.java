@@ -1,17 +1,15 @@
 package org.example.course2024.service;
 
-import org.example.course2024.dto.CustomerCreationDto;
-import org.example.course2024.dto.CustomerDto;
-import org.example.course2024.dto.CustomerUpdatingDto;
+import org.example.course2024.dto.*;
 import org.example.course2024.entity.Customer;
+import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.example.course2024.exception.NotFoundException;
 import org.example.course2024.mapper.CustomerMapper;
 import org.example.course2024.repository.CustomerRepository;
-import org.springframework.stereotype.Service;
+import lombok.AllArgsConstructor;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,97 +22,75 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public CustomerDto getById(Long id) {
-        Customer customer = customerRepository.findById(id).
-                orElseThrow(() -> new NotFoundException("Customer not found"));
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Customer not found"));
         return customerMapper.toDto(customer);
     }
 
-  public CustomerDto create(CustomerCreationDto customerDto) {
+    public CustomerDto create(CustomerCreationDto customerDto) {
         return customerMapper.toDto(customerRepository.save(customerMapper.toEntity(customerDto)));
-  }
+    }
 
     @Transactional(readOnly = true)
-    public List<CustomerDto> getAll(){
-        return customerRepository.findAll().stream()
+    public PagedDataDto<CustomerDto> getAll(PageRequest pageRequest) {
+        Page<Customer> customers = customerRepository.findAll(pageRequest);
+        List<CustomerDto> data = customers.getContent().stream()
                 .map(customerMapper::toDto)
                 .collect(Collectors.toList());
+
+        PagedDataDto<CustomerDto> pageAllCustomers = new PagedDataDto<>();
+        pageAllCustomers.setData(data);
+        pageAllCustomers.setPage(customers.getNumber());
+        pageAllCustomers.setTotal(customers.getTotalElements());
+        pageAllCustomers.setTotalPages(customers.getTotalPages());
+        pageAllCustomers.setPageSize(customers.getSize());
+        return pageAllCustomers;
     }
 
     public CustomerDto update(Long id, CustomerUpdatingDto customerUpdatingDto) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Customer not found"));
 
-        if(customerUpdatingDto.id() != null ) {
-            customer.setId(customerUpdatingDto.id());
-        }
-        if (customerUpdatingDto.name() != null && !customerUpdatingDto.name().isEmpty()) {
-            customer.setName(customerUpdatingDto.name());
-        }
-
-        if (customerUpdatingDto.surname() != null && !customerUpdatingDto.surname().isEmpty()) {
-            customer.setSurname(customerUpdatingDto.surname());
-        }
-
-        if (customerUpdatingDto.middleName() != null && !customerUpdatingDto.middleName().isEmpty()) {
-            customer.setMiddleName(customerUpdatingDto.middleName());
-        }
-
-        if (customerUpdatingDto.phone() != null && !customerUpdatingDto.phone().isEmpty()) {
-            customer.setPhone(customerUpdatingDto.phone());
-        }
-        if (customerUpdatingDto.email() != null) {
-            customer.setEmail(customerUpdatingDto.email());
-        }
-        if (customerUpdatingDto.partBody() != null) {
-            customer.setPartBody(customerUpdatingDto.partBody());
-        }
+        if (customerUpdatingDto.name() != null) customer.setName(customerUpdatingDto.name());
+        if (customerUpdatingDto.surname() != null) customer.setSurname(customerUpdatingDto.surname());
+        if (customerUpdatingDto.middleName() != null) customer.setMiddleName(customerUpdatingDto.middleName());
+        if (customerUpdatingDto.phone() != null) customer.setPhone(customerUpdatingDto.phone());
+        if (customerUpdatingDto.email() != null) customer.setEmail(customerUpdatingDto.email());
+        if (customerUpdatingDto.partBody() != null) customer.setPartBody(customerUpdatingDto.partBody());
 
         return customerMapper.toDto(customerRepository.save(customer));
     }
 
-    public void delete(Long id){
+    public void delete(Long id) {
         customerRepository.deleteById(id);
     }
 
-    public  List<CustomerDto> search(String keyword){
-        List<Customer> customers = customerRepository.findAll().stream()
-                .filter(customer ->
-                        (customer.getPhone() != null && customer.getPhone().contains(keyword)) ||
-                                (customer.getName() != null && customer.getName().toLowerCase().contains(keyword.toLowerCase())) ||
-                                (customer.getSurname() != null && customer.getSurname().toLowerCase().contains(keyword.toLowerCase()))||
-                                (customer.getPartBody() != null && customer.getPartBody().toString().contains(keyword.toUpperCase()))
-                )
+    public PagedDataDto<CustomerDto> search(String keyword, PageRequest pageRequest) {
+        List<Customer> filteredCustomers = customerRepository.findAll().stream()
+                .filter(customer -> (customer.getPhone() != null && customer.getPhone().contains(keyword)) ||
+                        (customer.getName() != null && customer.getName().toLowerCase().contains(keyword.toLowerCase())) ||
+                        (customer.getSurname() != null && customer.getSurname().toLowerCase().contains(keyword.toLowerCase())) ||
+                        (customer.getPartBody() != null && customer.getPartBody().toString().contains(keyword.toUpperCase())))
                 .collect(Collectors.toList());
 
-            return customers.stream().map(customer -> customerMapper.toDto(customer)).collect(Collectors.toList());
-        }
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min((start + pageRequest.getPageSize()), filteredCustomers.size());
+        List<Customer> pageContent = filteredCustomers.subList(start, end);
+        Page<Customer> customersPage = new PageImpl<>(pageContent, pageRequest, filteredCustomers.size());
 
-    public List<CustomerDto> sorted(String keyword, boolean reverse) {
-        List<Customer> customers = customerRepository.findAll();
+        List<CustomerDto> content = filteredCustomers.stream().map(customerMapper::toDto).collect(Collectors.toList());
 
-        List<Customer> sortedCustomers;
-        if (keyword.equalsIgnoreCase("name")) {
-            sortedCustomers = customers.stream()
-                    .sorted(reverse? Comparator.comparing(Customer::getName).reversed()
-                            :Comparator.comparing(Customer::getName))
-                    .collect(Collectors.toList());
-        } else if (keyword.equalsIgnoreCase("surname")) {
-            sortedCustomers = customers.stream()
-                    .sorted(reverse? Comparator.comparing(Customer::getSurname).reversed()
-                            :Comparator.comparing(Customer::getSurname))
-                    .collect(Collectors.toList());
-        } else if (keyword.equalsIgnoreCase("phone")) {
-            sortedCustomers = customers.stream()
-                    .sorted(reverse? Comparator.comparing(Customer::getPhone).reversed()
-                            :Comparator.comparing(Customer::getPhone))
-                    .collect(Collectors.toList());
-        } else {
-            sortedCustomers = customers;
-        }
-
-        return sortedCustomers.stream()
-                .map(customer -> customerMapper.toDto(customer))
-                .collect(Collectors.toList());
-    }
+        PagedDataDto<CustomerDto> allCustomerPage = new PagedDataDto<>();
+        allCustomerPage.setData(content);
+        allCustomerPage.setPage(customersPage.getNumber());
+        allCustomerPage.setTotal(customersPage.getTotalElements());
+        allCustomerPage.setTotalPages(customersPage.getTotalPages());
+        allCustomerPage.setPageSize(customersPage.getSize());
+        return  allCustomerPage;
     }
 
+//    public PagedDataDto<CustomerDto> sortCustomer(String keyword, boolean reverse, PageRequest pageRequest) {
+//        Sort sort = Sort.by(reverse ? Sort.Direction.DESC : Sort.Direction.ASC, keyword);
+//        return getAll(PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort));
+//    }
+}
