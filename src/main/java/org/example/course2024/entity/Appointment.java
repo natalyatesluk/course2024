@@ -29,6 +29,10 @@ public class Appointment {
     @JoinColumn(name = "master_id", nullable = false)
     private Master master;
 
+    @ManyToOne
+    @JoinColumn(name ="price_id", nullable = false)
+    private Price price;
+
     @Enumerated(EnumType.STRING)
     private StatusAppoint status;
 }

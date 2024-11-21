@@ -5,11 +5,12 @@ import jakarta.validation.constraints.Positive;
 import org.example.course2024.enums.StatusAppoint;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * DTO for {@link org.example.course2024.entity.Appointment}
  */
 public record AppointmentUpdatingDto(@Positive Long id, Long customerId, Long scheduleId, @FutureOrPresent LocalDateTime localDateTime, Long masterId,
-                                     StatusAppoint status) implements Serializable {
+                                     StatusAppoint status, Long priceId, BigDecimal pricePrice) implements Serializable {
 }

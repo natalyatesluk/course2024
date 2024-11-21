@@ -14,6 +14,8 @@ public interface AppointmentMapper {
     @Mapping(source = "customerId", target = "customer.id")
     Appointment toEntity(AppointmentCreationDto appointmentCreationDto);
 
+    @Mapping(source = "price.price", target = "priceBasePrice")
+    @Mapping(source = "price.size", target = "priceSize")
     @Mapping(source = "id", target = "id")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "customer.surname", target = "customerSurname")
@@ -39,6 +41,8 @@ public interface AppointmentMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Appointment partialUpdate(AppointmentUpdatingDto appointmentUpdatingDto, @MappingTarget Appointment appointment);
 
+    @Mapping(source = "priceBasePrice", target = "price.price")
+    @Mapping(source = "priceSize", target = "price.size")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Appointment partialUpdate(AppointmentDto appointmentDto, @MappingTarget Appointment appointment);
 }

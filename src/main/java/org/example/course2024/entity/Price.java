@@ -29,4 +29,8 @@ public class Price {
     @ManyToOne
     @JoinColumn (name = "master_id", nullable = false)
     private Master master;
+
+    @OneToMany(mappedBy = "price", cascade = CascadeType.ALL)
+    private List<Appointment> appointment;
+
 }

@@ -6,17 +6,16 @@ import org.example.course2024.entity.*;
 import org.example.course2024.enums.StatusAppoint;
 import org.example.course2024.enums.StatusTime;
 import org.example.course2024.exception.MasterNotSchedule;
+import org.example.course2024.exception.MasterNotThisPrice;
 import org.example.course2024.exception.NotFoundException;
 import org.example.course2024.exception.ScheduleAlreadyBusyException;
 import org.example.course2024.mapper.AppointmentMapper;
-import org.example.course2024.repository.AppointmentRepository;
-import org.example.course2024.repository.CustomerRepository;
-import org.example.course2024.repository.MasterRepository;
-import org.example.course2024.repository.ScheduleRepository;
+import org.example.course2024.repository.*;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -31,6 +30,7 @@ public class AppointmentService {
     private final CustomerRepository customerRepository;
     private final MasterRepository masterRepository;
     private final ScheduleRepository scheduleRepository;
+    private final PriceRepository priceRepository;
 
     @Transactional(readOnly = true)
     public PagedDataDto<AppointmentDto> getAll(PageRequest pageRequest) {
@@ -43,22 +43,26 @@ public class AppointmentService {
     }
 
     @Transactional(readOnly = true)
-    public AppointmentDto getById(Long id){
+    public AppointmentDto getById(Long id) {
         return appointmentMapper.
-                toDto(appointmentRepository.findById(id).orElseThrow(()->new NotFoundException("Appointment not found")));
+                toDto(appointmentRepository.findById(id).orElseThrow(() -> new NotFoundException("Appointment not found")));
     }
 
-    public AppointmentDto create(AppointmentCreationDto appointmentDto){
-        Customer customer = customerRepository.findById(appointmentDto.customerId()).orElseThrow(()->new NotFoundException("Customer not found"));
-        Master master = masterRepository.findById(appointmentDto.masterId()).orElseThrow(()->new NotFoundException("Master not found"));
-        Schedule schedule = scheduleRepository.findById(appointmentDto.scheduleId()).orElseThrow(()->new NotFoundException("Schedule not found"));
+    public AppointmentDto create(AppointmentCreationDto appointmentDto) {
+        Customer customer = customerRepository.findById(appointmentDto.customerId()).orElseThrow(() -> new NotFoundException("Customer not found"));
+        Master master = masterRepository.findById(appointmentDto.masterId()).orElseThrow(() -> new NotFoundException("Master not found"));
+        Schedule schedule = scheduleRepository.findById(appointmentDto.scheduleId()).orElseThrow(() -> new NotFoundException("Schedule not found"));
+        Price price = priceRepository.findById(appointmentDto.priceId()).orElseThrow(() -> new NotFoundException("Price not found"));
         Appointment appointment = appointmentMapper.toEntity(appointmentDto);
 
         if (schedule.getStatus() == StatusTime.BUSY) {
             throw new ScheduleAlreadyBusyException("The selected schedule is already marked as busy.");
         }
-        if(!Objects.equals(schedule.getMaster().getId(), appointment.getMaster().getId())){
+        if (!Objects.equals(schedule.getMaster().getId(), appointment.getMaster().getId())) {
             throw new MasterNotSchedule("This master doesn't match this record");
+        }
+        if (!Objects.equals(price.getMaster().getId(), appointment.getMaster().getId())) {
+            throw new MasterNotThisPrice("This master doesn't match this price");
         }
 
         appointment.setCustomer(customer);
@@ -66,6 +70,7 @@ public class AppointmentService {
         schedule.setStatus(StatusTime.BUSY);
         scheduleRepository.save(schedule);
         appointment.setSchedule(schedule);
+        appointment.setPrice(price);
         appointmentRepository.save(appointment);
         return appointmentMapper.toDto(appointment);
     }
@@ -108,7 +113,7 @@ public class AppointmentService {
             if (scheduleNew.getStatus() == StatusTime.BUSY) {
                 throw new ScheduleAlreadyBusyException("The selected schedule is already marked as busy.");
             }
-            if(!Objects.equals(scheduleNew.getMaster().getId(), appointment.getMaster().getId())){
+            if (!Objects.equals(scheduleNew.getMaster().getId(), appointment.getMaster().getId())) {
                 throw new MasterNotSchedule("This master doesn't match this record");
             }
             scheduleOld.setStatus(StatusTime.FREE);
@@ -119,19 +124,36 @@ public class AppointmentService {
 
             appointment.setSchedule(scheduleNew);
         }
-        if(appointmentDto.localDateTime() != null){
-            Schedule schedule = scheduleRepository.findById(appointment.getSchedule().getId()).orElseThrow(()->new NotFoundException("Schedule not found"));
+        if (appointmentDto.localDateTime() != null) {
+            Schedule schedule = scheduleRepository.findById(appointment.getSchedule().getId()).orElseThrow(() -> new NotFoundException("Schedule not found"));
             schedule.setDate(appointmentDto.localDateTime());
             scheduleRepository.save(schedule);
             appointment.setSchedule(schedule);
+        }
+        if (appointmentDto.priceId() != null) {
+            Price newPrice = priceRepository.findById(appointmentDto.priceId()).
+                    orElseThrow(() -> new NotFoundException("Price not found"));
+
+            if (!Objects.equals(newPrice.getMaster().getId(), appointment.getMaster().getId())) {
+                throw new MasterNotThisPrice("This master doesn't match this price");
+            }
+
+            appointment.setPrice(newPrice);
+        }
+        if (appointmentDto.pricePrice() != null) {
+            Price price = priceRepository.findById(appointment.getPrice().getId())
+                    .orElseThrow(() -> new NotFoundException("Price not found"));
+            price.setPrice(appointmentDto.pricePrice());
+            appointment.setPrice(price);
         }
         appointmentRepository.save(appointment);
         return appointmentMapper.toDto(appointment);
     }
 
-    public void delete(Long id){
+    public void delete(Long id) {
         appointmentRepository.deleteById(id);
     }
+
     public Map<StatusAppoint, Long> getStatusCounts() {
         List<Appointment> appointments = appointmentRepository.findAll();
         return appointments.stream()
@@ -161,7 +183,7 @@ public class AppointmentService {
         int end = Math.min((start + pageable.getPageSize()), filteredPrice.size());
         List<Appointment> pageContent = filteredPrice.subList(start, end);
         Page<Appointment> masters = new PageImpl<>(pageContent, pageable, filteredPrice.size());
-        List<AppointmentDto> content =  filteredPrice.stream().map(master -> appointmentMapper.toDto(master)).collect(Collectors.toList());
+        List<AppointmentDto> content = filteredPrice.stream().map(master -> appointmentMapper.toDto(master)).collect(Collectors.toList());
 
         PagedDataDto<AppointmentDto> appointmentDtoPagedDataDto = new PagedDataDto<>();
         appointmentDtoPagedDataDto.setData(content);
@@ -173,6 +195,7 @@ public class AppointmentService {
         return appointmentDtoPagedDataDto;
 
     }
+
     @Transactional(readOnly = true)
     public PagedDataDto<AppointmentDto> getStatusList(String status, int page, int size, boolean asc) {
         Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, "id");
