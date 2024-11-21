@@ -1,5 +1,6 @@
 package org.example.course2024.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.example.course2024.dto.PagedDataDto;
 import org.example.course2024.dto.ScheduleCreationDto;
@@ -39,13 +40,13 @@ public class ScheduleController {
 
     @PostMapping()
     @CacheEvict(value = {"schedules", "scheduleById"}, allEntries = true)
-    public ResponseEntity<ScheduleDto> createSchedule(@RequestBody ScheduleCreationDto scheduleDto) {
+    public ResponseEntity<ScheduleDto> createSchedule(@Valid  @RequestBody ScheduleCreationDto scheduleDto) {
         return new ResponseEntity<>(scheduleService.create(scheduleDto), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     @CacheEvict(value = {"schedules", "scheduleById"}, allEntries = true)
-    public ResponseEntity<ScheduleDto> updateSchedule(@PathVariable Long id, @RequestBody ScheduleUpdatingDto scheduleDto) {
+    public ResponseEntity<ScheduleDto> updateSchedule(@Valid @PathVariable Long id, @RequestBody ScheduleUpdatingDto scheduleDto) {
         return new ResponseEntity<>(scheduleService.update(id, scheduleDto), HttpStatus.OK);
     }
 

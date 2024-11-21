@@ -1,5 +1,6 @@
 package org.example.course2024.controller;
 
+import jakarta.validation.Valid;
 import org.example.course2024.dto.CustomerCreationDto;
 import org.example.course2024.dto.CustomerDto;
 import org.example.course2024.dto.CustomerUpdatingDto;
@@ -40,13 +41,13 @@ public class CustomerController {
 
     @CachePut(value = "customers")
     @PostMapping()
-    public ResponseEntity<CustomerDto> createCustomer(@RequestBody CustomerCreationDto customerDto) {
+    public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody CustomerCreationDto customerDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(customerDto));
     }
 
     @CachePut(value = "customers", key = "#id")
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable Long id, @RequestBody CustomerUpdatingDto customerDto) {
+    public ResponseEntity<CustomerDto> updateCustomer(@Valid @PathVariable Long id, @RequestBody CustomerUpdatingDto customerDto) {
         return ResponseEntity.ok(customerService.update(id, customerDto));
     }
 

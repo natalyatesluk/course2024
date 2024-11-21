@@ -37,7 +37,6 @@ public class CustomerService {
         List<CustomerDto> data = customers.getContent().stream()
                 .map(customerMapper::toDto)
                 .collect(Collectors.toList());
-
         PagedDataDto<CustomerDto> pageAllCustomers = new PagedDataDto<>();
         pageAllCustomers.setData(data);
         pageAllCustomers.setPage(customers.getNumber());

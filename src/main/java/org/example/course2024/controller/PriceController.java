@@ -1,5 +1,6 @@
 package org.example.course2024.controller;
 
+import jakarta.validation.Valid;
 import org.example.course2024.dto.*;
 import org.example.course2024.service.PriceService;
 import org.springframework.cache.annotation.CacheEvict;
@@ -40,13 +41,13 @@ public class PriceController {
 
     @CachePut(value = "price")
     @PostMapping()
-    public ResponseEntity<PriceDto> createPrice(@RequestBody PriceCreationDto priceDto) {
+    public ResponseEntity<PriceDto> createPrice(@Valid  @RequestBody PriceCreationDto priceDto) {
         return new ResponseEntity<>(priceService.create(priceDto), HttpStatus.CREATED);
     }
 
     @CachePut(value = "price", key = "#id")
     @PutMapping("/{id}")
-    public ResponseEntity<PriceDto> updatePrice(@PathVariable Long id, @RequestBody PriceUpdatingDto priceDto) {
+    public ResponseEntity<PriceDto> updatePrice(@Valid @PathVariable Long id, @RequestBody PriceUpdatingDto priceDto) {
         return new ResponseEntity<>(priceService.update(id, priceDto), HttpStatus.OK);
     }
 

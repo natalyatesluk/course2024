@@ -1,7 +1,6 @@
 package org.example.course2024.service;
 
 import lombok.AllArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
 import org.example.course2024.dto.*;
 import org.example.course2024.entity.*;
 import org.example.course2024.enums.StatusAppoint;
@@ -18,7 +17,6 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,8 +34,10 @@ public class AppointmentService {
 
     @Transactional(readOnly = true)
     public PagedDataDto<AppointmentDto> getAll(PageRequest pageRequest) {
+
         Page<Appointment> appointments = appointmentRepository.findAll(pageRequest);
         List<Appointment> appointmentList = appointments.getContent();
+
         List<AppointmentDto> appointmentDtoList = appointmentList.stream().map(appointment -> appointmentMapper.toDto(appointment)).collect(Collectors.toList());
         return new PagedDataDto<>(appointmentDtoList, appointments.getNumber(), appointments.getSize(), appointments.getTotalElements(), appointments.getTotalPages());
     }

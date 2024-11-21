@@ -1,6 +1,7 @@
     package org.example.course2024.controller;
 
 
+    import jakarta.validation.Valid;
     import lombok.AllArgsConstructor;
     import org.example.course2024.dto.*;
     import org.example.course2024.entity.Appointment;
@@ -42,13 +43,13 @@
 
         @CachePut(value = "appointment")
         @PostMapping()
-        public ResponseEntity<AppointmentDto> createAppointment(@RequestBody AppointmentCreationDto appointmentDto) {
+        public ResponseEntity<AppointmentDto> createAppointment(@Valid  @RequestBody AppointmentCreationDto appointmentDto) {
             return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.create(appointmentDto));
         }
 
         @CachePut(value = "appointment", key = "'id_' + #id")
         @PutMapping("/{id}")
-        public ResponseEntity<AppointmentDto> updateAppointment(@PathVariable Long id,@RequestBody AppointmentUpdatingDto appointmentDto) {
+        public ResponseEntity<AppointmentDto> updateAppointment(@Valid @PathVariable Long id,@RequestBody AppointmentUpdatingDto appointmentDto) {
             return new ResponseEntity<>(appointmentService.update(appointmentDto,id), HttpStatus.OK);
         }
 

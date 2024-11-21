@@ -16,7 +16,6 @@ import org.example.course2024.mapper.MasterMapper;
 import org.example.course2024.repository.MasterRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +43,6 @@ public class MasterService {
 
         Page<Master> masters = masterRepository.findAll(pageRequest);
         List<Master> masterList = masters.getContent();
-
         List<MasterDto> data = masterList.stream().map(master -> masterMapper.toDto(master)).collect(Collectors.toList());
         PagedDataDto<MasterDto> pageMasterAll = new PagedDataDto<>();
         pageMasterAll.setData(data);
