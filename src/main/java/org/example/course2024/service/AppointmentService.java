@@ -1,14 +1,9 @@
 package org.example.course2024.service;
 
 import lombok.AllArgsConstructor;
-import org.example.course2024.dto.AppointmentCreationDto;
-import org.example.course2024.dto.AppointmentDto;
-import org.example.course2024.dto.AppointmentUpdatingDto;
-import org.example.course2024.dto.ScheduleDto;
-import org.example.course2024.entity.Appointment;
-import org.example.course2024.entity.Customer;
-import org.example.course2024.entity.Master;
-import org.example.course2024.entity.Schedule;
+import org.checkerframework.checker.units.qual.A;
+import org.example.course2024.dto.*;
+import org.example.course2024.entity.*;
 import org.example.course2024.enums.StatusAppoint;
 import org.example.course2024.enums.StatusTime;
 import org.example.course2024.exception.MasterNotSchedule;
@@ -19,6 +14,7 @@ import org.example.course2024.repository.AppointmentRepository;
 import org.example.course2024.repository.CustomerRepository;
 import org.example.course2024.repository.MasterRepository;
 import org.example.course2024.repository.ScheduleRepository;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,9 +35,11 @@ public class AppointmentService {
     private final ScheduleRepository scheduleRepository;
 
     @Transactional(readOnly = true)
-    public List<AppointmentDto> getAll(){
-        return appointmentRepository.findAll().
-                stream().map(appointmentMapper::toDto).collect(Collectors.toList());
+    public PagedDataDto<AppointmentDto> getAll(PageRequest pageRequest) {
+        Page<Appointment> appointments = appointmentRepository.findAll(pageRequest);
+        List<Appointment> appointmentList = appointments.getContent();
+        List<AppointmentDto> appointmentDtoList = appointmentList.stream().map(appointment -> appointmentMapper.toDto(appointment)).collect(Collectors.toList());
+        return new PagedDataDto<>(appointmentDtoList, appointments.getNumber(), appointments.getSize(), appointments.getTotalElements(), appointments.getTotalPages());
     }
 
     @Transactional(readOnly = true)
@@ -138,6 +136,60 @@ public class AppointmentService {
         List<Appointment> appointments = appointmentRepository.findAll();
         return appointments.stream()
                 .collect(Collectors.groupingBy(Appointment::getStatus, Collectors.counting()));
+    }
+
+    public PagedDataDto<AppointmentDto> search(String keyword, PageRequest pageRequest) {
+        Pageable pageable = pageRequest;
+        List<Appointment> filteredPrice = appointmentRepository.findAllByPage(pageRequest).stream()
+                .filter(appointment ->
+                        (appointment.getCustomer().getSurname() != null && appointment.getCustomer().getSurname().toLowerCase().contains(keyword.toLowerCase())) ||
+                                (appointment.getMaster().getSurname() != null && appointment.getMaster().getSurname().toLowerCase().contains(keyword.toLowerCase())) ||
+                                (appointment.getCustomer().getName() != null && appointment.getCustomer().getName().toLowerCase().contains(keyword.toLowerCase())) ||
+                                (appointment.getMaster().getName() != null && appointment.getMaster().getName().toLowerCase().contains(keyword.toLowerCase())) ||
+                                (appointment.getCustomer().getEmail() != null && appointment.getCustomer().getEmail().toLowerCase().contains(keyword.toLowerCase())) ||
+                                (appointment.getCustomer().getPhone() != null && appointment.getCustomer().getPhone().contains(keyword)) ||
+                                (appointment.getMaster().getEmail() != null && appointment.getMaster().getEmail().toLowerCase().contains(keyword.toLowerCase())) ||
+                                (appointment.getMaster().getPhone() != null && appointment.getMaster().getPhone().contains(keyword)) ||
+                                (String.valueOf(appointment.getCustomer().getId()).equals(keyword)) ||
+                                (String.valueOf(appointment.getMaster().getId()).equals(keyword)) ||
+                                (String.valueOf(appointment.getSchedule().getId()).equals(keyword)) ||
+                                (appointment.getSchedule().getDate() != null && appointment.getSchedule().getDate().toString().contains(keyword)) // Пошук за часом
+                )
+                .collect(Collectors.toList());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), filteredPrice.size());
+        List<Appointment> pageContent = filteredPrice.subList(start, end);
+        Page<Appointment> masters = new PageImpl<>(pageContent, pageable, filteredPrice.size());
+        List<AppointmentDto> content =  filteredPrice.stream().map(master -> appointmentMapper.toDto(master)).collect(Collectors.toList());
+
+        PagedDataDto<AppointmentDto> appointmentDtoPagedDataDto = new PagedDataDto<>();
+        appointmentDtoPagedDataDto.setData(content);
+        appointmentDtoPagedDataDto.setPage(masters.getNumber());
+        appointmentDtoPagedDataDto.setPageSize(masters.getSize());
+        appointmentDtoPagedDataDto.setTotal(masters.getTotalElements());
+        appointmentDtoPagedDataDto.setTotalPages(masters.getTotalPages());
+
+        return appointmentDtoPagedDataDto;
+
+    }
+    @Transactional(readOnly = true)
+    public PagedDataDto<AppointmentDto> getStatusList(String status, int page, int size, boolean asc) {
+        Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, "id");
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        StatusAppoint statusAppoint = StatusAppoint.valueOf(status.toUpperCase());
+        Page<Appointment> schedulesPage = appointmentRepository.findByStatus(statusAppoint, pageable);
+        List<Appointment> appointmentList = schedulesPage.getContent();
+        List<AppointmentDto> appointmentDtoList = appointmentList.stream().map(appointment -> appointmentMapper.toDto(appointment)).collect(Collectors.toUnmodifiableList());
+
+        PagedDataDto<AppointmentDto> appointmentDtoPagedDataDto = new PagedDataDto<>();
+        appointmentDtoPagedDataDto.setData(appointmentDtoList);
+        appointmentDtoPagedDataDto.setPage(schedulesPage.getNumber());
+        appointmentDtoPagedDataDto.setPageSize(schedulesPage.getSize());
+        appointmentDtoPagedDataDto.setTotal(schedulesPage.getTotalElements());
+        appointmentDtoPagedDataDto.setTotalPages(schedulesPage.getTotalPages());
+        return appointmentDtoPagedDataDto;
     }
 }
 
