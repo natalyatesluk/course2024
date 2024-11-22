@@ -88,6 +88,10 @@ public class CustomerService {
         return  allCustomerPage;
     }
 
+    public Object getAppointmentsByCustomerId(Long id) {
+
+    }
+
 //    public PagedDataDto<CustomerDto> sortCustomer(String keyword, boolean reverse, PageRequest pageRequest) {
 //        Sort sort = Sort.by(reverse ? Sort.Direction.DESC : Sort.Direction.ASC, keyword);
 //        return getAll(PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort));

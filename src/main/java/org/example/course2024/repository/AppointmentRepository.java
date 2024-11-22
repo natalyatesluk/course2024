@@ -26,4 +26,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     @Query("SELECT p FROM Appointment p WHERE p.master.id = :idMaster")
     List<Appointment> findByMaster(Long idMaster);
+
+    @Query("SELECT p FROM Appointment p WHERE p.customer.id = :idCustomer")
+    List<Appointment> findByCustomer(Long idCustomer);
 }

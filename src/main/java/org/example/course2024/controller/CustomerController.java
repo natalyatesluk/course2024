@@ -92,4 +92,14 @@ public class CustomerController {
         Sort sort = Sort.by(reverse ? Sort.Direction.DESC : Sort.Direction.ASC, keyword);
         return new ResponseEntity<>(customerService.getAll(PageRequest.of(page, size, sort)), HttpStatus.OK);
     }
+
+    @Operation(summary = "Get Customer's appointments list", description = "Retrieve a list of appointments related to a Customer by ID")
+    @Cacheable(value = "customers", key = "#id + '_appointments'")
+    @GetMapping("/customer/{id}/appointments")
+    public ResponseEntity<?> getCustomerAppointmentsById(
+            @Parameter(description = "ID of the Customer") @PathVariable Long id) {
+        Object appointments = customerService.getAppointmentsByCustomerId(id);
+        return new ResponseEntity<>(appointments, HttpStatus.OK);
+    }
+
 }

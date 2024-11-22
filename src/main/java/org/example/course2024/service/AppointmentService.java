@@ -219,5 +219,10 @@ public class AppointmentService {
         List <Appointment> prices= appointmentRepository.findByMaster(idMaster);
         return prices.stream().map(appointmentMapper::toDto).collect(Collectors.toList());
     }
+    public List<AppointmentDto> getByCustomer(Long idCustomer){
+
+        List <Appointment> prices= appointmentRepository.findByCustomer(idCustomer);
+        return prices.stream().map(appointmentMapper::toDto).collect(Collectors.toList());
+    }
 }
 
