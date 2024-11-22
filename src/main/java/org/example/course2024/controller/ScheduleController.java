@@ -39,7 +39,7 @@ public class ScheduleController {
     }
 
     @PostMapping()
-    @CacheEvict(value = {"schedules", "scheduleById"}, allEntries = true)
+    @CacheEvict(value = {"schedules"}, allEntries = true)
     public ResponseEntity<ScheduleDto> createSchedule(@Valid  @RequestBody ScheduleCreationDto scheduleDto) {
         return new ResponseEntity<>(scheduleService.create(scheduleDto), HttpStatus.CREATED);
     }

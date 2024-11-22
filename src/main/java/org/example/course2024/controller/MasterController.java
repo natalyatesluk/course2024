@@ -79,4 +79,13 @@ public class MasterController {
         Sort sort = Sort.by(reverse ? Sort.Direction.DESC : Sort.Direction.ASC, keyword);
         return new ResponseEntity<>(masterService.getAll(PageRequest.of(page, size, sort)), HttpStatus.OK);
     }
+    @Cacheable(value = "masters", key = "#id + '_' + #listName")
+    @GetMapping("/{id}/{listName}")
+    public ResponseEntity<?> getMasterListById(
+            @PathVariable Long id,
+            @PathVariable String listName) {
+        Object list = masterService.getListByMasterIdAndName(id, listName);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
 }

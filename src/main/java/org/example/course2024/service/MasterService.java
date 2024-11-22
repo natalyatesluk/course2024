@@ -116,6 +116,22 @@ public class MasterService {
 
     }
 
+    public Object getListByMasterIdAndName(Long id, String listName) {
+        Master master = masterRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Master not found with id: " + id));
+
+        switch (listName.toLowerCase()) {
+            case "appointment":
+                return master.getAppointment();
+            case "schedules":
+                return master.getSchedules();
+            case "price":
+                return master.getPrice();
+            default:
+                throw new IllegalArgumentException("Invalid list name: " + listName);
+        }
+    }
+
 //    public List<MasterDto> sorted(String keyword, boolean reverse) {
 //        List<Master> masters = masterRepository.findAll();
 //
