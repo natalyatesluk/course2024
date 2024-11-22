@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class CustomerService {
     private final CustomerMapper customerMapper;
     private final CustomerRepository customerRepository;
+    private final AppointmentService appointmentService;
 
     @Transactional(readOnly = true)
     public CustomerDto getById(Long id) {
@@ -89,7 +90,7 @@ public class CustomerService {
     }
 
     public Object getAppointmentsByCustomerId(Long id) {
-
+        return  appointmentService.getByCustomer(id);
     }
 
 //    public PagedDataDto<CustomerDto> sortCustomer(String keyword, boolean reverse, PageRequest pageRequest) {

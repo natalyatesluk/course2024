@@ -31,6 +31,7 @@ public class AppointmentService {
     private final MasterRepository masterRepository;
     private final ScheduleRepository scheduleRepository;
     private final PriceRepository priceRepository;
+    private final EmailService emailService;
 
     @Transactional(readOnly = true)
     public PagedDataDto<AppointmentDto> getAll(PageRequest pageRequest) {
@@ -72,6 +73,27 @@ public class AppointmentService {
         appointment.setSchedule(schedule);
         appointment.setPrice(price);
         appointmentRepository.save(appointment);
+
+        String subject = "Appointment Confirmation";
+        String body = String.format(
+                "Hello %s,\n\n" +
+                        "Your appointment with Master %s is scheduled for %s.\n" +
+                        "Price: %s\n\n" +
+                        "Thank you for choosing our service!",
+                customer.getName(), master.getName(),
+                appointment.getSchedule().getDate().toString(),
+                price.getPrice());
+
+        // Отримуємо email клієнта з Customer
+        String customerEmail = customer.getEmail();
+
+        // Перевіряємо, чи є електронна адреса
+        if (customerEmail == null || customerEmail.isEmpty()) {
+            throw new NotFoundException("Customer email not found");
+        }
+
+        // Надсилаємо лист на вказану електронну адресу
+        emailService.sendEmail(customerEmail, subject, body);
         return appointmentMapper.toDto(appointment);
     }
 
