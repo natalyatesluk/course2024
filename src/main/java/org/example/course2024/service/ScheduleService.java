@@ -60,7 +60,11 @@ public class ScheduleService {
 
         return toPagedDataDto(schedulesPage);
     }
+    public List<ScheduleDto> getPriceByMaster(Long idMaster){
 
+        List <Schedule> prices= scheduleRepository.findByMaster(idMaster);
+        return prices.stream().map(scheduleMapper::toDto).collect(Collectors.toList());
+    }
     @Transactional(readOnly = true)
     public PagedDataDto<ScheduleDto> getStatusList(String status, int page, int size, boolean asc) {
         Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, "date");

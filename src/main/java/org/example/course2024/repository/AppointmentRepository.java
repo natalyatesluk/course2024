@@ -23,4 +23,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     @Query("SELECT a FROM Appointment a WHERE a.status = :status")
     Page<Appointment> findByStatus(@Param("status") StatusAppoint status, Pageable pageable);
+
+    @Query("SELECT p FROM Appointment p WHERE p.master.id = :idMaster")
+    List<Appointment> findByMaster(Long idMaster);
 }

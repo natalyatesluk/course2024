@@ -3,6 +3,7 @@ package org.example.course2024.service;
 import org.example.course2024.dto.MasterCreationDto;
 import org.example.course2024.dto.MasterUpdatingDto;
 import org.example.course2024.dto.PagedDataDto;
+import org.example.course2024.repository.ScheduleRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +26,9 @@ import java.util.stream.Collectors;
 public class MasterService {
     private final MasterMapper masterMapper;
     private final MasterRepository masterRepository;
+    private final PriceService priceService;
+    private final ScheduleRepository scheduleRepository;
+    private final AppointmentService appointmentService;
 
     @Transactional(readOnly = true)
     public MasterDto getById(Long id) {
@@ -122,11 +126,11 @@ public class MasterService {
 
         switch (listName.toLowerCase()) {
             case "appointment":
-                return master.getAppointment();
+                return appointmentService.getPriceByMaster(id);
             case "schedules":
-                return master.getSchedules();
+                return appointmentService.getPriceByMaster(id);
             case "price":
-                return master.getPrice();
+                return priceService.getPriceByMaster(id);
             default:
                 throw new IllegalArgumentException("Invalid list name: " + listName);
         }

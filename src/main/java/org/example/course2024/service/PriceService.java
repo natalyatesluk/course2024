@@ -96,6 +96,12 @@ public class PriceService {
         return allPagePrice;
     }
 
+    public List<PriceDto> getPriceByMaster(Long idMaster){
+
+        List <Price> prices= priceRepository.findByMaster(idMaster);
+        return prices.stream().map(priceMapper::toDto).collect(Collectors.toList());
+    }
+
     public PagedDataDto<PriceDto> search(String keyword, PageRequest pageRequest) {
         Pageable pageable = pageRequest;
         List<Price> filteredPrice = priceRepository.findAllByPage(pageRequest).stream()

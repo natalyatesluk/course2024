@@ -214,5 +214,10 @@ public class AppointmentService {
         appointmentDtoPagedDataDto.setTotalPages(schedulesPage.getTotalPages());
         return appointmentDtoPagedDataDto;
     }
+    public List<AppointmentDto> getPriceByMaster(Long idMaster){
+
+        List <Appointment> prices= appointmentRepository.findByMaster(idMaster);
+        return prices.stream().map(appointmentMapper::toDto).collect(Collectors.toList());
+    }
 }
 

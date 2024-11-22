@@ -19,4 +19,7 @@ public interface PriceRepository extends JpaRepository<Price, Long> {
 
     @Query("from Price")
     public List<Price> findAllByPage(PageRequest pageRequest);
+
+    @Query("SELECT p FROM Price p WHERE p.master.id = :idMaster")
+    List<Price> findByMaster(Long idMaster);
 }

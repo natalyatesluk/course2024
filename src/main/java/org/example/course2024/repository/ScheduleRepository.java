@@ -1,6 +1,7 @@
 package org.example.course2024.repository;
 
 import org.example.course2024.entity.Master;
+import org.example.course2024.entity.Price;
 import org.example.course2024.entity.Schedule;
 import org.example.course2024.enums.StatusTime;
 import org.springframework.data.domain.Page;
@@ -50,4 +51,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     @Query("SELECT s FROM Schedule s WHERE s.status = :status")
     List<Schedule> findByStatus(@Param("status") StatusTime status);
+
+    @Query("SELECT p FROM Schedule p WHERE p.master.id = :idMaster")
+    List<Schedule> findByMaster(Long idMaster);
 }
