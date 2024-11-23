@@ -9,6 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import java.util.EnumSet;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -36,6 +38,15 @@ public class UserService {
         }
 
         return save(user);
+    }
+    public User updateUserRole(Long userId, Role newRole) {
+            if (newRole == null || !EnumSet.allOf(Role.class).contains(newRole)) {
+            throw new IllegalArgumentException("Invalid role");
+        }
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        user.setRole(newRole);
+        return repository.save(user);
     }
 
     /**

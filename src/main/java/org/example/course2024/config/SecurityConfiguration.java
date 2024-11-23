@@ -53,6 +53,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, "/api/masters/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/masters/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/masters/**/appointment").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/auth/**/role").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())

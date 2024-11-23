@@ -7,11 +7,15 @@ import lombok.RequiredArgsConstructor;
 import org.example.course2024.dto.JwtAuthenticationResponse;
 import org.example.course2024.dto.SignInRequest;
 import org.example.course2024.dto.SignUpRequest;
+import org.example.course2024.dto.UserDto;
+import org.example.course2024.entity.User;
+import org.example.course2024.enums.Role;
+import org.example.course2024.mapper.UserMapper;
 import org.example.course2024.service.AuthenticationService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.example.course2024.service.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -19,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Аутентификация")
 public class AuthController {
     private final AuthenticationService authenticationService;
+    private final UserService userService;
+    private final UserMapper userMapper;
 
     @Operation(summary = "Регистрация пользователя")
     @PostMapping("/sign-up")
@@ -30,5 +36,13 @@ public class AuthController {
     @PostMapping("/sign-in")
     public JwtAuthenticationResponse signIn(@RequestBody @Valid SignInRequest request) {
         return authenticationService.signIn(request);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/role")
+    public ResponseEntity<UserDto> updateUserRole(
+            @PathVariable Long id,
+            @RequestParam Role newRole) {
+        User updatedUser = userService.updateUserRole(id, newRole);
+        return ResponseEntity.ok(userMapper.toDto (updatedUser));
     }
 }
