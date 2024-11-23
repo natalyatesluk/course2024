@@ -1,7 +1,6 @@
 package org.example.course2024.repository;
 
 import org.example.course2024.entity.Master;
-import org.example.course2024.entity.Price;
 import org.example.course2024.entity.Schedule;
 import org.example.course2024.enums.StatusTime;
 import org.springframework.data.domain.Page;
@@ -19,33 +18,25 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query
     Schedule findByDateAndMaster(LocalDateTime date, Master master);
 
-    @Query("SELECT s FROM Schedule s WHERE FUNCTION('DATE', s.date) BETWEEN :startDate AND :endDate")
-    List<Schedule> findByDateRange(
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate);
-    @Query("SELECT s FROM Schedule s WHERE FUNCTION('DATE', s.date) BETWEEN :startDate AND :endDate")
+
+    @Query("SELECT s FROM Schedule s WHERE s.date BETWEEN :startDate AND :endDate")
     Page<Schedule> findByDateRange(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             Pageable pageable);
 
-    @Query(value = "SELECT * FROM schedule s WHERE CAST(s.date AS TIME) BETWEEN :startTime AND :endTime", nativeQuery = true)
-    List<Schedule> findByTimeRange(
+    @Query("SELECT s FROM Schedule s WHERE s.time BETWEEN :startTime AND :endTime")
+    Page<Schedule> findByTimeRange(
             @Param("startTime") LocalTime startTime,
-            @Param("endTime") LocalTime endTime);
-
-
-    @Query("SELECT s FROM Schedule s WHERE s.date BETWEEN :startDateTime AND :endDateTime")
-    Page<Schedule> findByDateTimeRange(
-            @Param("startDateTime") LocalDateTime startDateTime,
-            @Param("endDateTime") LocalDateTime endDateTime,
+            @Param("endTime") LocalTime endTime,
             Pageable pageable);
+
 
     @Query("SELECT s FROM Schedule s WHERE s.status = :status")
     Page<Schedule> findByStatus(@Param("status") StatusTime status, Pageable pageable);
 
     @Query("SELECT s FROM Schedule s WHERE s.date BETWEEN :startDateTime AND :endDateTime")
-    List<Schedule> findByDateTimeRange(
+    List<Schedule> findByDateRange(
             @Param("startDateTime") LocalDateTime startDateTime,
             @Param("endDateTime") LocalDateTime endDateTime);
 
@@ -54,4 +45,9 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     @Query("SELECT p FROM Schedule p WHERE p.master.id = :idMaster")
     List<Schedule> findByMaster(Long idMaster);
+
+    @Query("SELECT s FROM Schedule s " +
+            "WHERE s.date BETWEEN :startDate AND :endDate " +
+            "AND s.time BETWEEN :startTime AND :endTime")
+    Page<Schedule> findByDateAndTimeRange(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime, Pageable pageable);
 }

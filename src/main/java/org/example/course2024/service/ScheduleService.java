@@ -4,11 +4,9 @@ package org.example.course2024.service;
 import lombok.AllArgsConstructor;
 import org.example.course2024.dto.*;
 import org.example.course2024.entity.Master;
-import org.example.course2024.entity.Price;
 import org.example.course2024.entity.Schedule;
 import org.example.course2024.enums.StatusTime;
 import org.example.course2024.exception.NotFoundException;
-import org.example.course2024.mapper.PriceMapperImpl;
 import org.example.course2024.mapper.ScheduleMapper;
 import org.example.course2024.repository.MasterRepository;
 import org.example.course2024.repository.ScheduleRepository;
@@ -42,25 +40,38 @@ public class ScheduleService {
 
         return toPagedDataDto(schedulesPage);
     }
+    @Transactional(readOnly = true)
+    public PagedDataDto<ScheduleDto> getByDateAndTimeRange(
+            LocalDate startDate, LocalDate endDate,
+            LocalTime startTime, LocalTime endTime,
+            int page, int size, boolean asc) {
+        Sort sort = Sort.by(
+                asc ? Sort.Direction.ASC : Sort.Direction.DESC,
+                "date", "time"
+        );
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Schedule> schedulesPage = scheduleRepository.findByDateAndTimeRange(
+                startDate, endDate, startTime, endTime, pageable);
+
+        return toPagedDataDto(schedulesPage);
+    }
+
 
     @Transactional(readOnly = true)
     public PagedDataDto<ScheduleDto> getByDateRange(LocalDate startDate, LocalDate endDate, int page, int size, boolean asc) {
         Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, "date");
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Schedule> schedulesPage = scheduleRepository.findByDateRange(startDate, endDate, pageable);
-
         return toPagedDataDto(schedulesPage);
     }
-
     @Transactional(readOnly = true)
-    public PagedDataDto<ScheduleDto> getByDateTimeRange(LocalDateTime startDateTime, LocalDateTime endDateTime, int page, int size, boolean asc) {
-        Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, "dateTime");
+    public PagedDataDto<ScheduleDto> getByTimeRange(LocalTime startTime, LocalTime endTime, int page, int size, boolean asc) {
+        Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, "date");
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Schedule> schedulesPage = scheduleRepository.findByDateTimeRange(startDateTime, endDateTime, pageable);
-
+        Page<Schedule> schedulesPage = scheduleRepository.findByTimeRange(startTime, endTime, pageable);
         return toPagedDataDto(schedulesPage);
     }
-    public List<ScheduleDto> getPriceByMaster(Long idMaster){
+    public List<ScheduleDto> getByMaster(Long idMaster){
 
         List <Schedule> prices= scheduleRepository.findByMaster(idMaster);
         return prices.stream().map(scheduleMapper::toDto).collect(Collectors.toList());

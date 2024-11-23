@@ -1,6 +1,7 @@
 package org.example.course2024.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.example.course2024.entity.JwtAuthenticationFilter;
@@ -46,11 +47,17 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/endpoint", "/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/masters/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/masters").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/masters").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/masters/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/masters/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/masters/**/appointment").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 

@@ -9,6 +9,7 @@ import org.example.course2024.enums.StatusTime;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table (name = "shedules")
@@ -22,7 +23,10 @@ public class Schedule {
     private Long id;
 
     @Column(name = "date", nullable = false)
-    private LocalDateTime date;
+    private LocalDate date;
+
+    @Column(name="time", nullable = false)
+    private LocalTime time;
 
     @Enumerated(EnumType.STRING)
     private StatusTime status;

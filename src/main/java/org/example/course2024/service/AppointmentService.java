@@ -15,7 +15,6 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -74,25 +73,23 @@ public class AppointmentService {
         appointment.setPrice(price);
         appointmentRepository.save(appointment);
 
-        String subject = "Appointment Confirmation";
+        String subject = "Your tattoo inscription";
         String body = String.format(
                 "Hello %s,\n\n" +
-                        "Your appointment with Master %s is scheduled for %s.\n" +
-                        "Price: %s\n\n" +
+                        "Your appointment with Master %s is scheduled for %s at %s.\n" +
+                        "Price: %s " + "(This is a base price, not a full price.)\n The full price will depend on the complexity of the work. "+
                         "Thank you for choosing our service!",
                 customer.getName(), master.getName(),
                 appointment.getSchedule().getDate().toString(),
+                appointment.getSchedule().getTime().toString(),
                 price.getPrice());
 
-        // Отримуємо email клієнта з Customer
         String customerEmail = customer.getEmail();
 
-        // Перевіряємо, чи є електронна адреса
         if (customerEmail == null || customerEmail.isEmpty()) {
             throw new NotFoundException("Customer email not found");
         }
 
-        // Надсилаємо лист на вказану електронну адресу
         emailService.sendEmail(customerEmail, subject, body);
         return appointmentMapper.toDto(appointment);
     }
@@ -146,9 +143,15 @@ public class AppointmentService {
 
             appointment.setSchedule(scheduleNew);
         }
-        if (appointmentDto.localDateTime() != null) {
+        if (appointmentDto.localDate() != null) {
             Schedule schedule = scheduleRepository.findById(appointment.getSchedule().getId()).orElseThrow(() -> new NotFoundException("Schedule not found"));
-            schedule.setDate(appointmentDto.localDateTime());
+            schedule.setDate(appointmentDto.localDate());
+            scheduleRepository.save(schedule);
+            appointment.setSchedule(schedule);
+        }
+        if (appointmentDto.localTime() != null) {
+            Schedule schedule = scheduleRepository.findById(appointment.getSchedule().getId()).orElseThrow(() -> new NotFoundException("Schedule not found"));
+            schedule.setTime(appointmentDto.localTime());
             scheduleRepository.save(schedule);
             appointment.setSchedule(schedule);
         }
@@ -196,9 +199,7 @@ public class AppointmentService {
                                 (appointment.getMaster().getPhone() != null && appointment.getMaster().getPhone().contains(keyword)) ||
                                 (String.valueOf(appointment.getCustomer().getId()).equals(keyword)) ||
                                 (String.valueOf(appointment.getMaster().getId()).equals(keyword)) ||
-                                (String.valueOf(appointment.getSchedule().getId()).equals(keyword)) ||
-                                (appointment.getSchedule().getDate() != null && appointment.getSchedule().getDate().toString().contains(keyword)) // Пошук за часом
-                )
+                                (String.valueOf(appointment.getSchedule().getId()).equals(keyword)))
                 .collect(Collectors.toList());
 
         int start = (int) pageable.getOffset();
@@ -236,7 +237,7 @@ public class AppointmentService {
         appointmentDtoPagedDataDto.setTotalPages(schedulesPage.getTotalPages());
         return appointmentDtoPagedDataDto;
     }
-    public List<AppointmentDto> getPriceByMaster(Long idMaster){
+    public List<AppointmentDto> getByMaster(Long idMaster){
 
         List <Appointment> prices= appointmentRepository.findByMaster(idMaster);
         return prices.stream().map(appointmentMapper::toDto).collect(Collectors.toList());

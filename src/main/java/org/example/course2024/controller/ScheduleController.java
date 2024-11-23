@@ -18,7 +18,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+
+import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/api/schedule")
@@ -76,23 +77,54 @@ public class ScheduleController {
     public ResponseEntity<PagedDataDto<ScheduleDto>> getSchedulesByDateRange(
             @Parameter(description = "Start date for the range") @RequestParam("startDate") LocalDate startDate,
             @Parameter(description = "End date for the range") @RequestParam("endDate") LocalDate endDate,
-            @Parameter(description = "Page number for pagination") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "Page size for pagination") @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "Sort order: true for ascending, false for descending") @RequestParam(defaultValue = "true") boolean asc) {
+            @Parameter(description = "Page number for pagination") @RequestParam(required = false, defaultValue = "0") int page,
+            @Parameter(description = "Page size for pagination") @RequestParam(required = false,defaultValue = "10") int size,
+            @Parameter(description = "Sort order: true for ascending, false for descending") @RequestParam(required = false,defaultValue = "true") boolean asc) {
         return new ResponseEntity<>(scheduleService.getByDateRange(startDate, endDate, page, size, asc), HttpStatus.OK);
     }
-
-    @Operation(summary = "Get Schedules by DateTime Range", description = "Retrieve Schedules within a specified date-time range")
-    @GetMapping("/timeDateRange")
-    @Cacheable(value = "schedules", key = "{#startDateTime, #endDateTime, #page, #size, #asc}")
-    public ResponseEntity<PagedDataDto<ScheduleDto>> getSchedulesByDateTimeRange(
-            @Parameter(description = "Start date-time for the range") @RequestParam("startDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
-            @Parameter(description = "End date-time for the range") @RequestParam("endDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime,
-            @Parameter(description = "Page number for pagination") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "Page size for pagination") @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "Sort order: true for ascending, false for descending") @RequestParam(defaultValue = "true") boolean asc) {
-        return new ResponseEntity<>(scheduleService.getByDateTimeRange(startDateTime, endDateTime, page, size, asc), HttpStatus.OK);
+    @Operation(summary = "Get Schedules by Time Range", description = "Retrieve Schedules within a specified time range")
+    @GetMapping("/time-range")
+    @Cacheable(value = "schedules", key = "{#startTime, #endTime, #page, #size, #asc}")
+    public ResponseEntity<PagedDataDto<ScheduleDto>> getSchedulesByTimeRange(
+            @Parameter(description = "Start date for the range") @RequestParam("startTime") LocalTime startTime,
+            @Parameter(description = "End date for the range") @RequestParam("endTime") LocalTime endTime,
+            @Parameter(description = "Page number for pagination") @RequestParam(required = false,defaultValue = "0") int page,
+            @Parameter(description = "Page size for pagination") @RequestParam(required = false,defaultValue = "10") int size,
+            @Parameter(description = "Sort order: true for ascending, false for descending") @RequestParam(required = false,defaultValue = "true") boolean asc) {
+        return new ResponseEntity<>(scheduleService.getByTimeRange(startTime, endTime, page, size, asc), HttpStatus.OK);
     }
+    @Operation(
+            summary = "Get Schedules by Date and Time Range",
+            description = "Retrieve Schedules within a specified date range and time range, sorted by date and time."
+    )
+    @GetMapping("/date-time-range")
+    @Cacheable(value = "schedules", key = "{#startDate, #endDate, #startTime, #endTime, #page, #size, #asc}")
+    public ResponseEntity<PagedDataDto<ScheduleDto>> getSchedulesByDateAndTimeRange(
+            @Parameter(description = "Start date for the range")
+            @RequestParam("startDate")  LocalDate startDate,
+
+            @Parameter(description = "End date for the range")
+            @RequestParam("endDate") LocalDate endDate,
+
+            @Parameter(description = "Start time for the range")
+            @RequestParam("startTime")  LocalTime startTime,
+
+            @Parameter(description = "End time for the range")
+            @RequestParam("endTime")  LocalTime endTime,
+
+            @Parameter(description = "Page number for pagination")
+            @RequestParam(required = false,defaultValue = "0") int page,
+
+            @Parameter(description = "Page size for pagination")
+            @RequestParam(required = false,defaultValue = "10") int size,
+
+            @Parameter(description = "Sort order: true for ascending, false for descending")
+            @RequestParam(required = false,defaultValue = "true") boolean asc) {
+
+        PagedDataDto<ScheduleDto> result = scheduleService.getByDateAndTimeRange(startDate, endDate, startTime, endTime, page, size, asc);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 
     @Operation(summary = "Get Schedules by Status", description = "Retrieve Schedules filtered by status")
     @GetMapping("/status")

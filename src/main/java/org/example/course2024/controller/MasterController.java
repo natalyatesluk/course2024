@@ -13,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,6 +50,7 @@ public class MasterController {
 
     @Operation(summary = "Create a new Master", description = "Add a new Master to the system")
     @CachePut(value = "masters")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<MasterDto> createMaster(
             @Valid @RequestBody MasterCreationDto masterDto) {
@@ -57,6 +60,7 @@ public class MasterController {
 
     @Operation(summary = "Update Master by ID", description = "Update details of an existing Master by their ID")
     @CachePut(value = "masters", key = "#id")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<MasterDto> updateMaster(
             @Parameter(description = "ID of the Master to update") @PathVariable Long id,
@@ -67,6 +71,7 @@ public class MasterController {
 
     @Operation(summary = "Delete Master by ID", description = "Delete an existing Master by their unique ID")
     @CacheEvict(value = "masters", key = "#id")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMaster(
             @Parameter(description = "ID of the Master to delete") @PathVariable Long id) {
@@ -102,7 +107,20 @@ public class MasterController {
     public ResponseEntity<?> getMasterListById(
             @Parameter(description = "ID of the Master") @PathVariable Long id,
             @Parameter(description = "Name of the list to retrieve (e.g., appointments, schedules, etc.)") @PathVariable String listName) {
+        if ("appointment".equalsIgnoreCase(listName)) {
+            // Only ADMIN can access appointments
+            if (!hasRole("ADMIN")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        }
         Object list = masterService.getListByMasterIdAndName(id, listName);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
+
+    private boolean hasRole(String role) {
+        // Check the authentication object for the user's role
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_" + role));
+    }
 }
+

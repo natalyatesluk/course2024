@@ -29,6 +29,7 @@
 
         @Cacheable(value = "appointment", key = "'page_' + #page + '_size_' + #size")
         @GetMapping()
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<PagedDataDto<AppointmentDto>> getAppointment(
                 @RequestParam(required = false, defaultValue = "0") int page,
                 @RequestParam(required = false, defaultValue = "5") int size
@@ -38,13 +39,13 @@
 
         @Cacheable(value = "appointment", key = "#id")
         @GetMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<AppointmentDto> getAppointmentById(@PathVariable Long id) {
             return new ResponseEntity<>(appointmentService.getById(id), HttpStatus.OK);
         }
 
         @CachePut(value = "appointment")
         @PostMapping()
-        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<AppointmentDto> createAppointment(@Valid  @RequestBody AppointmentCreationDto appointmentDto) {
             return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.create(appointmentDto));
         }
@@ -77,6 +78,7 @@
 
         @Cacheable(value = "appointment", key = "'search_' + #keyword + '_page_' + #page + '_size_' + #size")
         @GetMapping("/search")
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<PagedDataDto<AppointmentDto>> searchPrice(@RequestParam String keyword,
                                                                   @RequestParam(required = false, defaultValue = "0") int page,
                                                                   @RequestParam(required = false, defaultValue = "3") int size) {

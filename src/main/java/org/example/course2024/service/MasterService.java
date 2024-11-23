@@ -29,6 +29,7 @@ public class MasterService {
     private final PriceService priceService;
     private final ScheduleRepository scheduleRepository;
     private final AppointmentService appointmentService;
+    private final ScheduleService scheduleService;
 
     @Transactional(readOnly = true)
     public MasterDto getById(Long id) {
@@ -126,9 +127,9 @@ public class MasterService {
 
         switch (listName.toLowerCase()) {
             case "appointment":
-                return appointmentService.getPriceByMaster(id);
+                return appointmentService.getByMaster(id);
             case "schedules":
-                return appointmentService.getPriceByMaster(id);
+                return scheduleService.getByMaster(id);
             case "price":
                 return priceService.getPriceByMaster(id);
             default:
