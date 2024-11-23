@@ -15,6 +15,7 @@
     import org.springframework.http.HttpStatus;
     import org.springframework.http.HttpStatusCode;
     import org.springframework.http.ResponseEntity;
+    import org.springframework.security.access.prepost.PreAuthorize;
     import org.springframework.web.bind.annotation.*;
 
     import java.util.List;
@@ -43,18 +44,21 @@
 
         @CachePut(value = "appointment")
         @PostMapping()
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<AppointmentDto> createAppointment(@Valid  @RequestBody AppointmentCreationDto appointmentDto) {
             return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.create(appointmentDto));
         }
 
         @CachePut(value = "appointment", key = "'id_' + #id")
         @PutMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<AppointmentDto> updateAppointment(@Valid @PathVariable Long id,@RequestBody AppointmentUpdatingDto appointmentDto) {
             return new ResponseEntity<>(appointmentService.update(appointmentDto,id), HttpStatus.OK);
         }
 
         @CacheEvict(value = "appointment", key = "#id")
         @DeleteMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<AppointmentDto> deleteAppointment(@PathVariable Long id) {
             appointmentService.delete(id);
             return ResponseEntity.noContent().build();
@@ -62,6 +66,7 @@
 
         @Cacheable(value = "appointment", key = "'status_' + #status")
         @GetMapping("/status-counts")
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<Map<StatusAppoint, Long>> getStatusCounts(@RequestParam(defaultValue = "true") boolean status) {
             if(status) {
                 Map<StatusAppoint, Long> statusCounts = appointmentService.getStatusCounts();
@@ -91,6 +96,7 @@
 
         @GetMapping("/status")
         @Cacheable(value = "appointment", key = "{#status, #page, #size, #asc}")
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<PagedDataDto<AppointmentDto>> getSchedulesByStatus(
                 @RequestParam String status,
                 @RequestParam(required = false, defaultValue = "0") int page,
