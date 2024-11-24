@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,6 +47,7 @@ public class PriceController {
 
     @Operation(summary = "Create a new Price", description = "Add a new Price to the system")
     @CachePut(value = "price")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping()
     public ResponseEntity<PriceDto> createPrice(@Valid @RequestBody PriceCreationDto priceDto) {
         return new ResponseEntity<>(priceService.create(priceDto), HttpStatus.CREATED);
@@ -53,6 +55,7 @@ public class PriceController {
 
     @Operation(summary = "Update Price by ID", description = "Update details of an existing Price by its ID")
     @CachePut(value = "price", key = "#id")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<PriceDto> updatePrice(
             @Parameter(description = "ID of the Price to update") @PathVariable Long id,
@@ -62,6 +65,7 @@ public class PriceController {
 
     @Operation(summary = "Delete Price by ID", description = "Delete an existing Price by its unique ID")
     @CacheEvict(value = "price", key = "#id")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<PriceDto> deletePrice(
             @Parameter(description = "ID of the Price to delete") @PathVariable Long id) {

@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.example.course2024.enums.StatusTime;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity

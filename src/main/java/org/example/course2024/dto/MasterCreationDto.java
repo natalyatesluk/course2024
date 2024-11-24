@@ -1,11 +1,12 @@
 package org.example.course2024.dto;
 
 import jakarta.validation.constraints.*;
+import org.example.course2024.entity.Master;
 
 import java.io.Serializable;
 
 /**
- * DTO for {@link org.example.course2024.entity.Master}
+ * DTO for {@link Master}
  */
 public record MasterCreationDto(@NotNull @Size(max = 255) @NotEmpty @NotBlank String name,
                                 @NotNull @Size(max = 255) @NotEmpty @NotBlank String surname,

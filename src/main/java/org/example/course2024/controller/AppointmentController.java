@@ -4,7 +4,6 @@
     import jakarta.validation.Valid;
     import lombok.AllArgsConstructor;
     import org.example.course2024.dto.*;
-    import org.example.course2024.entity.Appointment;
     import org.example.course2024.enums.StatusAppoint;
     import org.example.course2024.service.AppointmentService;
     import org.springframework.cache.annotation.CacheEvict;
@@ -13,12 +12,10 @@
     import org.springframework.data.domain.PageRequest;
     import org.springframework.data.domain.Sort;
     import org.springframework.http.HttpStatus;
-    import org.springframework.http.HttpStatusCode;
     import org.springframework.http.ResponseEntity;
     import org.springframework.security.access.prepost.PreAuthorize;
     import org.springframework.web.bind.annotation.*;
 
-    import java.util.List;
     import java.util.Map;
 
     @RestController

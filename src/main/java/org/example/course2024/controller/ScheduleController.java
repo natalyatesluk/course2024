@@ -12,6 +12,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,7 +31,6 @@ public class ScheduleController {
 
     @Operation(summary = "Get all Schedules", description = "Retrieve a paginated list of all Schedules")
     @GetMapping()
-
     @Cacheable(value = "schedules", key = "{#page, #size, #asc}")
     public ResponseEntity<PagedDataDto<ScheduleDto>> getSchedules(
             @Parameter(description = "Page number for pagination") @RequestParam(defaultValue = "0") int page,
@@ -41,7 +41,7 @@ public class ScheduleController {
 
     @Operation(summary = "Get Schedule by ID", description = "Retrieve a single Schedule by its unique ID")
     @GetMapping("/{id}")
-    @Cacheable(value = "scheduleById", key = "#id")
+    @Cacheable(value = "schedules", key = "#id")
     public ResponseEntity<ScheduleDto> getSchedule(
             @Parameter(description = "ID of the Schedule to retrieve") @PathVariable Long id) {
         return new ResponseEntity<>(scheduleService.getById(id), HttpStatus.OK);
@@ -49,6 +49,7 @@ public class ScheduleController {
 
     @Operation(summary = "Create a new Schedule", description = "Add a new Schedule to the system")
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     @CacheEvict(value = {"schedules"}, allEntries = true)
     public ResponseEntity<ScheduleDto> createSchedule(@Valid @RequestBody ScheduleCreationDto scheduleDto) {
         return new ResponseEntity<>(scheduleService.create(scheduleDto), HttpStatus.CREATED);
@@ -56,7 +57,8 @@ public class ScheduleController {
 
     @Operation(summary = "Update Schedule by ID", description = "Update details of an existing Schedule by its ID")
     @PutMapping("/{id}")
-    @CacheEvict(value = {"schedules", "scheduleById"}, allEntries = true)
+    @CacheEvict(value = {"schedules"})
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ScheduleDto> updateSchedule(
             @Parameter(description = "ID of the Schedule to update") @PathVariable Long id,
             @Valid @RequestBody ScheduleUpdatingDto scheduleDto) {
@@ -65,7 +67,7 @@ public class ScheduleController {
 
     @Operation(summary = "Delete Schedule by ID", description = "Delete an existing Schedule by its unique ID")
     @DeleteMapping("/{id}")
-    @CacheEvict(value = {"schedules", "scheduleById"}, allEntries = true)
+    @CacheEvict(value = {"schedules"})
     public ResponseEntity<Void> deleteSchedule(
             @Parameter(description = "ID of the Schedule to delete") @PathVariable Long id) {
         scheduleService.delete(id);

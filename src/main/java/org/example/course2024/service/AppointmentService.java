@@ -77,7 +77,7 @@ public class AppointmentService {
         String body = String.format(
                 "Hello %s,\n\n" +
                         "Your appointment with Master %s is scheduled for %s at %s.\n" +
-                        "Price: %s " + "(This is a base price, not a full price.)\n The full price will depend on the complexity of the work. "+
+                        "Price: %s " + "(This is a base price, not a full.)\n The full price will depend on the complexity of the work. "+
                         "Thank you for choosing our service!",
                 customer.getName(), master.getName(),
                 appointment.getSchedule().getDate().toString(),

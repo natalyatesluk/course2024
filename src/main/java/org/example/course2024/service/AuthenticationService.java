@@ -5,8 +5,6 @@ import org.example.course2024.dto.JwtAuthenticationResponse;
 import org.example.course2024.dto.SignUpRequest;
 import org.example.course2024.entity.User;
 import org.example.course2024.enums.Role;
-import org.example.course2024.service.JwtService;
-import org.example.course2024.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;

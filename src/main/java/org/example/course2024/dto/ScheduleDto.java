@@ -1,16 +1,16 @@
 package org.example.course2024.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.example.course2024.entity.Schedule;
 import org.example.course2024.enums.StatusTime;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * DTO for {@link org.example.course2024.entity.Schedule}
+ * DTO for {@link Schedule}
  */
 public record ScheduleDto(Long id, @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
                           @JsonFormat(pattern = "HH:mm") LocalTime time, StatusTime status, Long masterId,
