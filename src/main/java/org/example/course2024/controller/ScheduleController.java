@@ -30,6 +30,7 @@ public class ScheduleController {
 
     @Operation(summary = "Get all Schedules", description = "Retrieve a paginated list of all Schedules")
     @GetMapping()
+
     @Cacheable(value = "schedules", key = "{#page, #size, #asc}")
     public ResponseEntity<PagedDataDto<ScheduleDto>> getSchedules(
             @Parameter(description = "Page number for pagination") @RequestParam(defaultValue = "0") int page,
